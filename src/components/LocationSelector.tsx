@@ -55,7 +55,9 @@ export function LocationSelector({
         if (list.length === 0) {
           setFeedback(`No cities found matching "${clean}". Try a nearby major city.`);
         } else {
-          setAnnouncement(`Found ${list.length} matching location${list.length === 1 ? '' : 's'} for ${clean}.`);
+          setAnnouncement(
+            `Found ${list.length} matching location${list.length === 1 ? '' : 's'} for ${clean}.`
+          );
         }
       }
     } catch (err) {
@@ -134,7 +136,9 @@ export function LocationSelector({
         <div className="flex items-center gap-2.5 text-sm text-[#102A43]">
           <MapPin className="h-4 w-4 text-[#20C997] shrink-0" aria-hidden="true" />
           <span className="font-semibold">{currentLocation.name}</span>
-          <span className="text-slate-500" aria-hidden="true">·</span>
+          <span className="text-slate-500" aria-hidden="true">
+            ·
+          </span>
           <span className="text-slate-600">
             {currentLocation.region}, {currentLocation.country}
           </span>

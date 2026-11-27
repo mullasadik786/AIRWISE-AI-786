@@ -91,4 +91,3 @@ test('select option parsers validate allowed values and return safe fallbacks', 
   assert.equal(parseRespiratorGrade('none'), 'none');
   assert.equal(parseRespiratorGrade('cloth', 'n95_ffp2'), 'n95_ffp2');
 });
-

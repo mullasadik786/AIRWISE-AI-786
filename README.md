@@ -66,13 +66,15 @@ npm start
 ```
 
 ## 10. Testing Instructions
-Run the full unit, integration, fuzz, accessibility, and backend API test suite:
+Run the full unit, component, hook, accessibility, fuzz, and backend API test suite:
 ```bash
 npm test
+npm run test:coverage
 ```
-Run strict TypeScript static type checking (`tsc --noEmit`):
+Run strict TypeScript checks, ESLint (`jsx-a11y`, `react-hooks`, security), Oxlint, and formatting checks:
 ```bash
 npm run lint
+npm run format:check
 ```
 
 ## 11. Deployment

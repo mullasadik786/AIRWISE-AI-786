@@ -1,10 +1,4 @@
-export type AqiCategory =
-  | 'Good'
-  | 'Satisfactory'
-  | 'Moderate'
-  | 'Poor'
-  | 'Very Poor'
-  | 'Severe';
+export type AqiCategory = 'Good' | 'Satisfactory' | 'Moderate' | 'Poor' | 'Very Poor' | 'Severe';
 
 export type UsAqiCategory =
   | 'Good'
@@ -32,10 +26,10 @@ export interface CityLocation {
 export interface PollutantReadings {
   pm25: number | null; // µg/m³
   pm10: number | null; // µg/m³
-  no2: number | null;  // µg/m³
-  so2: number | null;  // µg/m³
-  co: number | null;   // mg/m³ (converted from µg/m³ when from Open-Meteo)
-  o3: number | null;   // µg/m³
+  no2: number | null; // µg/m³
+  so2: number | null; // µg/m³
+  co: number | null; // mg/m³ (converted from µg/m³ when from Open-Meteo)
+  o3: number | null; // µg/m³
 }
 
 export interface WeatherReadings {
@@ -177,7 +171,13 @@ export interface AssistantStructuredReply {
 
 export interface SmartAlert {
   id: string;
-  type: 'severe_aqi' | 'rising_pm25' | 'forecast_alert' | 'ventilation_window' | 'filter_maintenance' | 'sustainability_goal';
+  type:
+    | 'severe_aqi'
+    | 'rising_pm25'
+    | 'forecast_alert'
+    | 'ventilation_window'
+    | 'filter_maintenance'
+    | 'sustainability_goal';
   severity: 'Critical' | 'Warning' | 'Advisory' | 'Info';
   title: string;
   message: string;

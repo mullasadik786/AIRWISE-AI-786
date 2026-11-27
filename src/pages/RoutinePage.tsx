@@ -1,6 +1,11 @@
 import { useMemo, useState } from 'react';
 import { CalendarClock, CheckCircle2, Circle, Download, SlidersHorizontal } from 'lucide-react';
-import type { EnvironmentalSnapshot, FamilyProfile, PageId, RoutineSlot } from '../types/airwise.ts';
+import type {
+  EnvironmentalSnapshot,
+  FamilyProfile,
+  PageId,
+  RoutineSlot,
+} from '../types/airwise.ts';
 import {
   buildDailyRoutine,
   formatDailyRoutineMarkdown,
@@ -46,9 +51,7 @@ export function RoutinePage({
   function handleTogglePeriod(period: RoutineSlot['period'], isDone: boolean) {
     onTogglePeriod(period);
     setAnnouncement(
-      isDone
-        ? `${period} routine marked incomplete.`
-        : `${period} routine marked completed.`
+      isDone ? `${period} routine marked incomplete.` : `${period} routine marked completed.`
     );
   }
 
@@ -76,7 +79,8 @@ export function RoutinePage({
                 Morning-to-Night Exposure & Habit Planner
               </h2>
               <p className="mt-1 text-xs text-slate-600">
-                Adapted to CPCB AQI {snapshot.cpcbAqi ?? 'N/A'}, wind {snapshot.weather.windSpeedKmh ?? 'N/A'} km/h, and household groups:{' '}
+                Adapted to CPCB AQI {snapshot.cpcbAqi ?? 'N/A'}, wind{' '}
+                {snapshot.weather.windSpeedKmh ?? 'N/A'} km/h, and household groups:{' '}
                 {formatHouseholdGroups(profile.groups)}.
               </p>
             </div>
@@ -139,7 +143,9 @@ export function RoutinePage({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className={`rounded-md border px-2.5 py-1 text-xs font-semibold ${suitabilityStyle}`}>
+                  <span
+                    className={`rounded-md border px-2.5 py-1 text-xs font-semibold ${suitabilityStyle}`}
+                  >
                     {slot.airSuitability}
                   </span>
                   <button

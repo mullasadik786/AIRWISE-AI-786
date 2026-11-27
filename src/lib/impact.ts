@@ -53,7 +53,7 @@ export const EMISSION_FACTORS = {
   GRID_INDIA_KG_PER_KWH: 0.716,
   GRID_GLOBAL_KG_PER_KWH: 0.475,
   LED_KWH_SAVED_PER_BULB_WEEK: 1.12,
-  WASTE_AVOIDED_KG_CO2E_PER_KG: 0.70,
+  WASTE_AVOIDED_KG_CO2E_PER_KG: 0.7,
 } as const;
 
 export function calculateCarbonImpact(input: CarbonCalculatorInput): CarbonImpactResult {
@@ -141,7 +141,9 @@ export function calculateCarbonImpact(input: CarbonCalculatorInput): CarbonImpac
   ];
 
   const weeklyBaselineKg = round2(breakdown.reduce((acc, item) => acc + item.baselineKgPerWeek, 0));
-  const weeklyAlternativeKg = round2(breakdown.reduce((acc, item) => acc + item.alternativeKgPerWeek, 0));
+  const weeklyAlternativeKg = round2(
+    breakdown.reduce((acc, item) => acc + item.alternativeKgPerWeek, 0)
+  );
   const weeklySavingsKg = round2(Math.max(0, weeklyBaselineKg - weeklyAlternativeKg));
   const dailySavingsKg = round2(weeklySavingsKg / 7);
   const monthlySavingsKg = round2((weeklySavingsKg / 7) * 30);

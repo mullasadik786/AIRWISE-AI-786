@@ -134,7 +134,10 @@ function computeLinearSubIndex(value: number, breakpoints: Breakpoint[]): number
   return 500;
 }
 
-export function calculateCpcbSubIndex(pollutant: keyof PollutantReadings, value: number | null): number | null {
+export function calculateCpcbSubIndex(
+  pollutant: keyof PollutantReadings,
+  value: number | null
+): number | null {
   if (value === null || !Number.isFinite(value) || value < 0) return null;
   return computeLinearSubIndex(value, CPCB_BREAKPOINTS[pollutant]);
 }
@@ -185,7 +188,10 @@ export function getCpcbCategory(aqi: number | null): AqiCategory {
   return 'Severe';
 }
 
-export function calculateUsAqiFromParticulates(pm25: number | null, pm10: number | null): {
+export function calculateUsAqiFromParticulates(
+  pm25: number | null,
+  pm10: number | null
+): {
   aqi: number | null;
   category: UsAqiCategory;
 } {
@@ -256,7 +262,8 @@ export function getCpcbCategoryMeta(category: AqiCategory): AqiVisualMeta {
         bgTintClass: 'bg-amber-50',
         textClass: 'text-amber-900',
         borderClass: 'border-amber-200',
-        healthSummary: 'Breathing discomfort possible for children, older adults, and sensitive groups.',
+        healthSummary:
+          'Breathing discomfort possible for children, older adults, and sensitive groups.',
         accessibleSymbol: 'Level 3 / Caution',
       };
     case 'Poor':
@@ -267,7 +274,8 @@ export function getCpcbCategoryMeta(category: AqiCategory): AqiVisualMeta {
         bgTintClass: 'bg-orange-50',
         textClass: 'text-orange-900',
         borderClass: 'border-orange-200',
-        healthSummary: 'Breathing discomfort on prolonged exposure; shift intense exercise indoors.',
+        healthSummary:
+          'Breathing discomfort on prolonged exposure; shift intense exercise indoors.',
         accessibleSymbol: 'Level 4 / Unhealthy',
       };
     case 'Very Poor':
@@ -278,7 +286,8 @@ export function getCpcbCategoryMeta(category: AqiCategory): AqiVisualMeta {
         bgTintClass: 'bg-red-50',
         textClass: 'text-red-900',
         borderClass: 'border-red-200',
-        healthSummary: 'High risk of respiratory irritation on prolonged exposure; protect indoors.',
+        healthSummary:
+          'High risk of respiratory irritation on prolonged exposure; protect indoors.',
         accessibleSymbol: 'Level 5 / High Alert',
       };
     case 'Severe':
@@ -302,18 +311,19 @@ export function sanitizeMeasurement(value: unknown, maxBound = 5000): number | n
   return Math.round(value * 10) / 10;
 }
 
-export function calculateWhoRatios(readings: PollutantReadings) {
-  const ratio = (val: number | null, limit: number) =>
-    val !== null && Number.isFinite(val) && val >= 0
-      ? Math.round((val / limit) * 10) / 10
-      : null;
+function computeWhoRatio(val: number | null, limit: number): number | null {
+  return val !== null && Number.isFinite(val) && val >= 0
+    ? Math.round((val / limit) * 10) / 10
+    : null;
+}
 
+export function calculateWhoRatios(readings: PollutantReadings) {
   return {
-    pm25Multiple: ratio(readings.pm25, WHO_2021_GUIDELINES.pm25_24h),
-    pm10Multiple: ratio(readings.pm10, WHO_2021_GUIDELINES.pm10_24h),
-    no2Multiple: ratio(readings.no2, WHO_2021_GUIDELINES.no2_24h),
-    so2Multiple: ratio(readings.so2, WHO_2021_GUIDELINES.so2_24h),
-    coMultiple: ratio(readings.co, WHO_2021_GUIDELINES.co_24h),
-    o3Multiple: ratio(readings.o3, WHO_2021_GUIDELINES.o3_8h),
+    pm25Multiple: computeWhoRatio(readings.pm25, WHO_2021_GUIDELINES.pm25_24h),
+    pm10Multiple: computeWhoRatio(readings.pm10, WHO_2021_GUIDELINES.pm10_24h),
+    no2Multiple: computeWhoRatio(readings.no2, WHO_2021_GUIDELINES.no2_24h),
+    so2Multiple: computeWhoRatio(readings.so2, WHO_2021_GUIDELINES.so2_24h),
+    coMultiple: computeWhoRatio(readings.co, WHO_2021_GUIDELINES.co_24h),
+    o3Multiple: computeWhoRatio(readings.o3, WHO_2021_GUIDELINES.o3_8h),
   };
 }

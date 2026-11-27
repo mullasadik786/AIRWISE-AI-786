@@ -132,7 +132,8 @@ export const COMMUNITY_CHALLENGES: CommunityChallenge[] = [
     id: 'chal-transit',
     title: 'Car-Light Commute Week',
     category: 'Transport',
-    goalDescription: 'Replace at least 3 solo car or two-wheeler trips this week with metro, bus, or carpooling.',
+    goalDescription:
+      'Replace at least 3 solo car or two-wheeler trips this week with metro, bus, or carpooling.',
     participantsCount: 418,
     estimatedWeeklyCo2SavedKgPerHome: 4.5,
     actionChecklist: [
@@ -145,7 +146,8 @@ export const COMMUNITY_CHALLENGES: CommunityChallenge[] = [
     id: 'chal-power',
     title: 'Peak-Hour Electricity Trim',
     category: 'Energy',
-    goalDescription: 'Cut household standby power and shift cooling setpoints to 24–25°C for 7 consecutive days.',
+    goalDescription:
+      'Cut household standby power and shift cooling setpoints to 24–25°C for 7 consecutive days.',
     participantsCount: 612,
     estimatedWeeklyCo2SavedKgPerHome: 7.1,
     actionChecklist: [
@@ -158,7 +160,8 @@ export const COMMUNITY_CHALLENGES: CommunityChallenge[] = [
     id: 'chal-notrip',
     title: 'Zero Unnecessary Errand Loops',
     category: 'Transport',
-    goalDescription: 'Consolidate grocery, pharmacy, and parcel errands into one single weekly route.',
+    goalDescription:
+      'Consolidate grocery, pharmacy, and parcel errands into one single weekly route.',
     participantsCount: 289,
     estimatedWeeklyCo2SavedKgPerHome: 1.9,
     actionChecklist: [
@@ -170,7 +173,8 @@ export const COMMUNITY_CHALLENGES: CommunityChallenge[] = [
     id: 'chal-indoor',
     title: 'Smoke-Free Clean Bedroom Initiative',
     category: 'Indoor',
-    goalDescription: 'Eliminate indoor incense, candles, and dry sweeping for 7 days to cut household PM2.5.',
+    goalDescription:
+      'Eliminate indoor incense, candles, and dry sweeping for 7 days to cut household PM2.5.',
     participantsCount: 534,
     estimatedWeeklyCo2SavedKgPerHome: 0.4,
     actionChecklist: [
@@ -183,7 +187,8 @@ export const COMMUNITY_CHALLENGES: CommunityChallenge[] = [
     id: 'chal-cleanhood',
     title: 'No-Burn Neighborhood Cleanliness Drive',
     category: 'Neighborhood',
-    goalDescription: 'Organize building or block-level leaf composting and report open waste burning to civic authorities.',
+    goalDescription:
+      'Organize building or block-level leaf composting and report open waste burning to civic authorities.',
     participantsCount: 194,
     estimatedWeeklyCo2SavedKgPerHome: 3.5,
     actionChecklist: [
@@ -227,7 +232,9 @@ export function buildDemoFallbackSnapshot(
       pm10,
       cpcbAqi: hCpcb.aqi,
       usAqi: hUs.aqi,
-      temperatureC: location.isIndia ? 21 + Math.round(Math.sin(idx / 4) * 5) : 14 + Math.round(Math.sin(idx / 4) * 4),
+      temperatureC: location.isIndia
+        ? 21 + Math.round(Math.sin(idx / 4) * 5)
+        : 14 + Math.round(Math.sin(idx / 4) * 4),
       windSpeedKmh: location.id === 'delhi-in' ? 5 : 11,
       isForecast: idx >= 12,
     };

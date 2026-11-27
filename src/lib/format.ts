@@ -53,12 +53,7 @@ export function slugifyCity(name: string): string {
 /**
  * Clamps a numeric input to a closed [min, max] range, returning fallback when non-finite.
  */
-export function clampFiniteNumber(
-  value: number,
-  min: number,
-  max: number,
-  fallback = min
-): number {
+export function clampFiniteNumber(value: number, min: number, max: number, fallback = min): number {
   if (!Number.isFinite(value)) return fallback;
   return Math.max(min, Math.min(max, value));
 }
@@ -66,22 +61,23 @@ export function clampFiniteNumber(
 /**
  * Clamps and rounds a numeric input to an integer within [min, max].
  */
-export function clampFiniteInt(
-  value: number,
-  min: number,
-  max: number,
-  fallback = min
-): number {
+export function clampFiniteInt(value: number, min: number, max: number, fallback = min): number {
   if (!Number.isFinite(value)) return fallback;
   return Math.max(min, Math.min(max, Math.round(value)));
 }
 
-export function parseGridRegion(value: string, fallback: 'INDIA' | 'GLOBAL' = 'INDIA'): 'INDIA' | 'GLOBAL' {
+export function parseGridRegion(
+  value: string,
+  fallback: 'INDIA' | 'GLOBAL' = 'INDIA'
+): 'INDIA' | 'GLOBAL' {
   if (value === 'INDIA' || value === 'GLOBAL') return value;
   return fallback;
 }
 
-export function parseAqiStandard(value: string, fallback: 'CPCB' | 'US_EPA' = 'CPCB'): 'CPCB' | 'US_EPA' {
+export function parseAqiStandard(
+  value: string,
+  fallback: 'CPCB' | 'US_EPA' = 'CPCB'
+): 'CPCB' | 'US_EPA' {
   if (value === 'CPCB' || value === 'US_EPA') return value;
   return fallback;
 }
@@ -92,4 +88,27 @@ export function parseRespiratorGrade(
 ): 'none' | 'surgical' | 'n95_ffp2' {
   if (value === 'none' || value === 'surgical' || value === 'n95_ffp2') return value;
   return fallback;
+}
+
+/**
+ * Replaces ASCII control characters (and optional invisible/bidi format characters) cleanly.
+ */
+export function stripControlCharacters(
+  value: string,
+  replacement: string,
+  stripInvisibleBidi = false
+): string {
+  let out = '';
+  for (let i = 0; i < value.length; i++) {
+    const code = value.charCodeAt(i);
+    const isAsciiCtrl = code <= 0x1f || code === 0x7f;
+    const isInvisibleBidi =
+      stripInvisibleBidi &&
+      ((code >= 0x200b && code <= 0x200f) ||
+        (code >= 0x202a && code <= 0x202e) ||
+        (code >= 0x2060 && code <= 0x206f) ||
+        code === 0xfeff);
+    out += isAsciiCtrl || isInvisibleBidi ? replacement : value[i];
+  }
+  return out;
 }

@@ -23,7 +23,7 @@ interface WorkspaceLayoutProps {
   onNavigate: (page: PageId) => void;
   location: CityLocation;
   unreadAlertsCount: number;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 interface NavItem {
@@ -204,7 +204,9 @@ export function WorkspaceLayout({
           aria-modal="true"
           aria-label="Mobile Navigation"
         >
-          <div
+          <button
+            type="button"
+            aria-label="Dismiss navigation drawer"
             className="fixed inset-0 bg-[#102A43]/40 backdrop-blur-xs"
             onClick={handleCloseDrawer}
           />
@@ -250,7 +252,9 @@ export function WorkspaceLayout({
             </button>
             <div className="flex items-center gap-2 text-sm min-w-0">
               <span className="hidden text-slate-600 sm:inline">Workspace</span>
-              <span className="hidden text-slate-400 sm:inline" aria-hidden="true">/</span>
+              <span className="hidden text-slate-400 sm:inline" aria-hidden="true">
+                /
+              </span>
               <h1 className="font-display text-base font-bold text-[#102A43] truncate sm:text-lg">
                 {currentItem.label}
               </h1>
@@ -264,7 +268,9 @@ export function WorkspaceLayout({
               className="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-slate-700 hover:text-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] whitespace-nowrap"
             >
               <Activity className="h-3.5 w-3.5 text-emerald-700" aria-hidden="true" />
-              <span>{location.name}, {location.countryCode}</span>
+              <span>
+                {location.name}, {location.countryCode}
+              </span>
             </button>
             <button
               type="button"

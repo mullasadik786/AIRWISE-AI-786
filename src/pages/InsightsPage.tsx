@@ -1,5 +1,14 @@
 import { useMemo, useState } from 'react';
-import { AlertTriangle, Clock, Download, Info, Table, TrendingDown, TrendingUp, Wind } from 'lucide-react';
+import {
+  AlertTriangle,
+  Clock,
+  Download,
+  Info,
+  Table,
+  TrendingDown,
+  TrendingUp,
+  Wind,
+} from 'lucide-react';
 import {
   CartesianGrid,
   Line,
@@ -45,12 +54,7 @@ export function InsightsPage({ snapshot }: InsightsPageProps) {
   function handleExportDispersionCsv() {
     const csv = buildCsvString(
       ['Time Window', 'Phase', 'CPCB AQI', 'Wind Speed (km/h)'],
-      chartData.map((row) => [
-        row.label,
-        row.phase,
-        row.cpcbAqi ?? '',
-        row.windSpeedKmh ?? '',
-      ])
+      chartData.map((row) => [row.label, row.phase, row.cpcbAqi ?? '', row.windSpeedKmh ?? ''])
     );
     downloadTextFile(
       csv,
@@ -64,12 +68,17 @@ export function InsightsPage({ snapshot }: InsightsPageProps) {
       <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-700">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-700" aria-hidden="true" />
         <p>
-          <strong>Data Transparency:</strong> These insights are computed directly from observed hourly measurements and meteorological forecast provider feeds ({snapshot.provider}). AIRWISE AI does not claim a proprietary machine-learning forecasting model.
+          <strong>Data Transparency:</strong> These insights are computed directly from observed
+          hourly measurements and meteorological forecast provider feeds ({snapshot.provider}).
+          AIRWISE AI does not claim a proprietary machine-learning forecasting model.
         </p>
       </div>
 
       {/* Insight Summary Cards */}
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Pollution Pattern Highlights">
+      <section
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        aria-label="Pollution Pattern Highlights"
+      >
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-xs font-semibold text-slate-600">Short-Term Trend</p>
           <div className="mt-2 flex items-center gap-2">
@@ -120,7 +129,8 @@ export function InsightsPage({ snapshot }: InsightsPageProps) {
             </span>
           </div>
           <p className="mt-1 text-xs text-slate-600">
-            Wind {snapshot.weather.windSpeedKmh ?? 'N/A'} km/h · RH {snapshot.weather.humidityPercent ?? 'N/A'}%
+            Wind {snapshot.weather.windSpeedKmh ?? 'N/A'} km/h · RH{' '}
+            {snapshot.weather.humidityPercent ?? 'N/A'}%
           </p>
         </div>
       </section>
@@ -133,7 +143,8 @@ export function InsightsPage({ snapshot }: InsightsPageProps) {
               Hourly CPCB AQI & Wind Dispersion Correlation ({snapshot.location.name})
             </h2>
             <p className="text-xs text-slate-600">
-              Compares modeled/observed CPCB AQI against 10m wind speed (km/h) across past 24h and next 24h forecast
+              Compares modeled/observed CPCB AQI against 10m wind speed (km/h) across past 24h and
+              next 24h forecast
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -168,7 +179,12 @@ export function InsightsPage({ snapshot }: InsightsPageProps) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                 <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#475569' }} minTickGap={24} />
                 <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#102A43' }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#0369A1' }} unit=" km/h" />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tick={{ fontSize: 11, fill: '#0369A1' }}
+                  unit=" km/h"
+                />
                 <Tooltip />
                 <Line
                   yAxisId="left"
@@ -192,7 +208,8 @@ export function InsightsPage({ snapshot }: InsightsPageProps) {
             </ResponsiveContainer>
           </div>
           <figcaption className="sr-only">
-            Hourly CPCB AQI and wind dispersion correlation across {chartData.length} hourly points. Toggle Accessible Table for numeric values.
+            Hourly CPCB AQI and wind dispersion correlation across {chartData.length} hourly points.
+            Toggle Accessible Table for numeric values.
           </figcaption>
         </figure>
 
@@ -218,7 +235,9 @@ export function InsightsPage({ snapshot }: InsightsPageProps) {
             <h3 className="font-display text-base font-bold text-[#102A43]">
               Weather-Driven Smog & Temperature Inversion Pattern
             </h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-700">{insights.weatherExplanation}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-700">
+              {insights.weatherExplanation}
+            </p>
             {fineToCoarseRatio !== null && (
               <p className="mt-2.5 text-xs text-slate-600">
                 <strong>Fine-to-Coarse Ratio (PM2.5 / PM10):</strong>{' '}
@@ -238,9 +257,18 @@ export function InsightsPage({ snapshot }: InsightsPageProps) {
               Preventive Actions for Upcoming Windows
             </h3>
             <ul className="mt-2.5 list-disc space-y-2 pl-4 text-sm text-slate-700">
-              <li>Schedule outdoor errands or brief ventilation near the cleanest window ({insights.cleanestWindow}).</li>
-              <li>Close bedroom and living-room windows ahead of evening rush hours ({insights.peakWindow}).</li>
-              <li>Prepare N95/FFP2 masks and verify HEPA pre-filters whenever stagnation risk is Moderate or High.</li>
+              <li>
+                Schedule outdoor errands or brief ventilation near the cleanest window (
+                {insights.cleanestWindow}).
+              </li>
+              <li>
+                Close bedroom and living-room windows ahead of evening rush hours (
+                {insights.peakWindow}).
+              </li>
+              <li>
+                Prepare N95/FFP2 masks and verify HEPA pre-filters whenever stagnation risk is
+                Moderate or High.
+              </li>
             </ul>
           </div>
         </div>

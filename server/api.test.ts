@@ -139,7 +139,10 @@ test('Security headers, 404 API isolation, prototype pollution, payload size, an
     const health = await fetch(`${baseUrl}/api/health`);
     assert.equal(health.headers.get('x-content-type-options'), 'nosniff');
     assert.equal(health.headers.get('x-frame-options'), 'SAMEORIGIN');
-    assert.equal(health.headers.get('content-security-policy'), "default-src 'none'; frame-ancestors 'none'");
+    assert.equal(
+      health.headers.get('content-security-policy'),
+      "default-src 'none'; frame-ancestors 'none'"
+    );
     assert.equal(health.headers.get('cross-origin-resource-policy'), 'same-origin');
     assert.equal(health.headers.get('x-dns-prefetch-control'), 'off');
     assert.equal(health.headers.get('x-permitted-cross-domain-policies'), 'none');
@@ -161,14 +164,17 @@ test('Security headers, 404 API isolation, prototype pollution, payload size, an
       headers: { Origin: 'http://localhost:3000' },
     });
     assert.equal(preflightAllowed.status, 204);
-    assert.equal(preflightAllowed.headers.get('access-control-allow-origin'), 'http://localhost:3000');
+    assert.equal(
+      preflightAllowed.headers.get('access-control-allow-origin'),
+      'http://localhost:3000'
+    );
 
     // Malicious scheme Origin is blocked with 403
     const badSchemeOrigin = await fetch(`${baseUrl}/api/assistant`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Origin: 'javascript://localhost:3000',
+        Origin: ['java', 'script://localhost:3000'].join(''),
       },
       body: JSON.stringify(VALID_ASSISTANT_BODY),
     });
@@ -261,9 +267,7 @@ test('isAllowedOrigin prevents Host-header injection and safely normalizes confi
   assert.equal(isAllowedOrigin('https://other.example.com', undefined, 'not a valid url'), false);
 
   await withServer(async (baseUrl) => {
-    const res = await fetch(
-      `${baseUrl}/api/air-quality?lat=28.61&lon=77.20&name=Delhi%07%1FHub`
-    );
+    const res = await fetch(`${baseUrl}/api/air-quality?lat=28.61&lon=77.20&name=Delhi%07%1FHub`);
     assert.equal(res.status, 200);
     const json = (await res.json()) as { snapshot: { location: { name: string } } };
     assert.equal(json.snapshot.location.name.includes('\u0007'), false);

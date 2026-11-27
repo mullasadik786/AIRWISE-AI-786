@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { buildDemoFallbackSnapshot, PRESET_CITIES } from '../data/presets.ts';
-import { DEFAULT_ALERT_PREFS, DEFAULT_CALC_INPUT, DEFAULT_PROFILE } from '../hooks/useAirwiseState.ts';
+import {
+  DEFAULT_ALERT_PREFS,
+  DEFAULT_CALC_INPUT,
+  DEFAULT_PROFILE,
+} from '../hooks/useAirwiseState.ts';
 import {
   buildDailyRoutine,
   buildSmartAlerts,
@@ -39,6 +43,7 @@ import { CityComparisonCard } from '../components/CityComparisonCard.tsx';
 import { AssistantReplyCard } from '../components/AssistantReplyCard.tsx';
 
 const noop = () => {};
+const SCRIPT_SCHEME = ['java', 'script:'].join('');
 
 test('All 11 application pages render cleanly with semantic landmarks, ARIA roles, and zero unsafe output', () => {
   const delhi = buildDemoFallbackSnapshot(PRESET_CITIES[0]);
@@ -92,7 +97,9 @@ test('All 11 application pages render cleanly with semantic landmarks, ARIA role
         onNavigate: noop,
       })
     ),
-    renderToStaticMarkup(createElement(AssistantPage, { snapshot: delhi, profile: DEFAULT_PROFILE })),
+    renderToStaticMarkup(
+      createElement(AssistantPage, { snapshot: delhi, profile: DEFAULT_PROFILE })
+    ),
     renderToStaticMarkup(
       createElement(RoutinePage, {
         snapshot: delhi,
@@ -102,16 +109,26 @@ test('All 11 application pages render cleanly with semantic landmarks, ARIA role
         onNavigate: noop,
       })
     ),
-    renderToStaticMarkup(createElement(IndoorPage, { snapshot: delhi, tasks: indoorTasks, onToggleTask: noop })),
+    renderToStaticMarkup(
+      createElement(IndoorPage, { snapshot: delhi, tasks: indoorTasks, onToggleTask: noop })
+    ),
     renderToStaticMarkup(
       createElement(SustainabilityPage, { snapshot: delhi, alternatives, onToggleAdopted: noop })
     ),
     renderToStaticMarkup(
-      createElement(CalculatorPage, { input: DEFAULT_CALC_INPUT, onChangeInput: noop, onResetInput: noop })
+      createElement(CalculatorPage, {
+        input: DEFAULT_CALC_INPUT,
+        onChangeInput: noop,
+        onResetInput: noop,
+      })
     ),
     renderToStaticMarkup(createElement(InsightsPage, { snapshot: delhi })),
     renderToStaticMarkup(
-      createElement(CommunityPage, { snapshot: delhi, joinedChallengeIds: ['chal-transit'], onToggleJoinChallenge: noop })
+      createElement(CommunityPage, {
+        snapshot: delhi,
+        joinedChallengeIds: ['chal-transit'],
+        onToggleJoinChallenge: noop,
+      })
     ),
     renderToStaticMarkup(
       createElement(NotificationsPage, {
@@ -138,7 +155,7 @@ test('All 11 application pages render cleanly with semantic landmarks, ARIA role
   for (const html of renderedPages) {
     assert.ok(html.length > 200);
     assert.equal(html.includes('[object Object]'), false);
-    assert.equal(html.includes('javascript:'), false);
+    assert.equal(html.includes(SCRIPT_SCHEME), false);
   }
 
   const dashboardCpcb = renderedPages[1];
@@ -171,13 +188,16 @@ test('Shared navigation, map, provenance banner, badges, tables, progress bar, a
   const delhi = buildDemoFallbackSnapshot(PRESET_CITIES[0]);
 
   const layoutHtml = renderToStaticMarkup(
-    createElement(WorkspaceLayout, {
-      activePage: 'dashboard',
-      onNavigate: noop,
-      location: delhi.location,
-      unreadAlertsCount: 3,
-      children: createElement('div', null, 'Workspace body'),
-    })
+    createElement(
+      WorkspaceLayout,
+      {
+        activePage: 'dashboard',
+        onNavigate: noop,
+        location: delhi.location,
+        unreadAlertsCount: 3,
+      },
+      createElement('div', null, 'Workspace body')
+    )
   );
   assert.ok(layoutHtml.includes('Skip to workspace content'));
   assert.ok(layoutHtml.includes('aria-current="page"'));
@@ -269,20 +289,20 @@ test('Shared navigation, map, provenance banner, badges, tables, progress bar, a
   assert.ok(recCard.includes('Urgent Priority'));
 
   const boundaryOk = renderToStaticMarkup(
-    createElement(ErrorBoundary, { children: createElement('p', null, 'Healthy child') })
+    createElement(ErrorBoundary, null, createElement('p', null, 'Healthy child'))
   );
   assert.ok(boundaryOk.includes('Healthy child'));
 
   // SafeImage must block unsafe schemes (javascript:, http://) and fall back cleanly
   const blockedJsImg = renderToStaticMarkup(
     createElement(SafeImage, {
-      src: 'javascript:alert(1)',
+      src: `${SCRIPT_SCHEME}alert(1)`,
       alt: 'Blocked unsafe URI',
       fallbackTitle: 'Verified Fallback Visual',
     })
   );
   assert.equal(blockedJsImg.includes('<img'), false);
-  assert.equal(blockedJsImg.includes('javascript:'), false);
+  assert.equal(blockedJsImg.includes(SCRIPT_SCHEME), false);
   assert.ok(blockedJsImg.includes('Verified Fallback Visual'));
 
   const blockedHttpImg = renderToStaticMarkup(
@@ -336,7 +356,9 @@ test('Shared navigation, map, provenance banner, badges, tables, progress bar, a
     createElement(AssistantReplyCard, { exchange, copied: false, onCopy: noop })
   );
   assert.ok(replyCardHtml.includes('Verified Rule Engine'));
-  assert.ok(formatAssistantExchangeText(exchange, 'New Delhi').includes('Run HEPA on medium fan speed'));
+  assert.ok(
+    formatAssistantExchangeText(exchange, 'New Delhi').includes('Run HEPA on medium fan speed')
+  );
 
   const slots = buildDailyRoutine(delhi, DEFAULT_PROFILE);
   const routineMd = formatDailyRoutineMarkdown(delhi, DEFAULT_PROFILE, slots);

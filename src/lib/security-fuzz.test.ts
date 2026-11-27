@@ -1,10 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  calculateCpcbAqi,
-  calculateUsAqiFromParticulates,
-  sanitizeMeasurement,
-} from './aqi.ts';
+import { calculateCpcbAqi, calculateUsAqiFromParticulates, sanitizeMeasurement } from './aqi.ts';
 import { calculateCarbonImpact } from './impact.ts';
 import { escapeCsvCell, escapeXml, slugifyCity } from './format.ts';
 import { sanitizeFilename } from './download.ts';

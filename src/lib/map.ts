@@ -73,8 +73,7 @@ export function getMapStationsForMode(
   return combined.map((station) => {
     const { x, y } = projectMapCoords(station.latitude, station.longitude, regionMode);
     const configuredAnchor = PIN_LABEL_ANCHORS[station.id]?.[regionMode];
-    const labelAnchor: LabelAnchor =
-      configuredAnchor ?? (x > 65 ? 'left' : 'right');
+    const labelAnchor: LabelAnchor = configuredAnchor ?? (x > 65 ? 'left' : 'right');
     return {
       station,
       x,

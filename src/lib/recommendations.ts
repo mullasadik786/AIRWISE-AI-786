@@ -45,10 +45,7 @@ interface RoutineContext {
   isWfh: boolean;
 }
 
-function buildMorningSlot(
-  snapshot: EnvironmentalSnapshot,
-  ctx: RoutineContext
-): RoutineSlot {
+function buildMorningSlot(snapshot: EnvironmentalSnapshot, ctx: RoutineContext): RoutineSlot {
   const { aqi, highRisk, elevated, hasChildren, hasOlder, hasSensitive, isFitness } = ctx;
   const airSuitability: RoutineSlot['airSuitability'] = highRisk
     ? 'Avoid Outdoor Exposure'
@@ -71,8 +68,10 @@ function buildMorningSlot(
       expectedBenefits: highRisk
         ? 'Significantly lowers inhaled PM2.5 dose during deep breathing.'
         : 'Reduces peak roadside particulate intake during morning rush hour.',
-      estimatedImpact: 'Exercise increases breathing volume 3–6x; shifting indoors during Poor+ AQI cuts active PM2.5 inhalation substantially.',
-      confidenceAndLimitations: 'High confidence for exposure reduction; exact indoor PM2.5 depends on window sealing and filtration.',
+      estimatedImpact:
+        'Exercise increases breathing volume 3–6x; shifting indoors during Poor+ AQI cuts active PM2.5 inhalation substantially.',
+      confidenceAndLimitations:
+        'High confidence for exposure reduction; exact indoor PM2.5 depends on window sealing and filtration.',
       factBasis: `Current CPCB AQI is ${snapshot.cpcbAqi ?? 'unavailable'} (${snapshot.cpcbCategory}), PM2.5 is ${snapshot.pollutants.pm25 ?? 'N/A'} µg/m³.`,
     },
   ];
@@ -85,9 +84,12 @@ function buildMorningSlot(
       what: 'Use indoor cycling, mobility, or strength sessions instead of outdoor tempo runs.',
       why: 'High ventilation rates during cardio bypass nasal filtration and draw fine particulates deeper into airways.',
       when: 'During your planned morning workout window.',
-      expectedBenefits: 'Preserves cardiovascular training consistency while avoiding acute airway irritation.',
-      estimatedImpact: 'Avoids elevated particulate deposition associated with vigorous outdoor exertion.',
-      confidenceAndLimitations: 'Guidance based on standard public-health exercise advisories; consult a physician if you experience symptoms.',
+      expectedBenefits:
+        'Preserves cardiovascular training consistency while avoiding acute airway irritation.',
+      estimatedImpact:
+        'Avoids elevated particulate deposition associated with vigorous outdoor exertion.',
+      confidenceAndLimitations:
+        'Guidance based on standard public-health exercise advisories; consult a physician if you experience symptoms.',
       factBasis: `Dominant pollutant: ${snapshot.dominantPollutant}.`,
     });
   }
@@ -105,10 +107,7 @@ function buildMorningSlot(
   };
 }
 
-function buildAfternoonSlot(
-  snapshot: EnvironmentalSnapshot,
-  ctx: RoutineContext
-): RoutineSlot {
+function buildAfternoonSlot(snapshot: EnvironmentalSnapshot, ctx: RoutineContext): RoutineSlot {
   const { aqi, wind, highRisk, isCommuter, isOutdoorWorker, isWfh } = ctx;
   const airSuitability: RoutineSlot['airSuitability'] =
     aqi > 300
@@ -120,7 +119,10 @@ function buildAfternoonSlot(
   const actions: StructuredRecommendation[] = [
     {
       id: 'afternoon-commute',
-      title: isCommuter || isOutdoorWorker ? 'Use lower-traffic commute corridors' : 'Plan midday errands efficiently',
+      title:
+        isCommuter || isOutdoorWorker
+          ? 'Use lower-traffic commute corridors'
+          : 'Plan midday errands efficiently',
       priority: highRisk ? 'High' : 'Moderate',
       what: isCommuter
         ? 'Use metro/rail or closed-cabin public transit where available, combine errands into one trip, and avoid idling in congested intersections.'
@@ -129,9 +131,12 @@ function buildAfternoonSlot(
           : 'Schedule essential outdoor errands during midday dispersion windows rather than peak traffic hours.',
       why: `Wind speed is ${wind} km/h. Road corridors carry elevated NO2 and fresh tailpipe particulates compared to residential blocks.`,
       when: '12:00 to 16:00 local time (usually better vertical mixing than dawn/dusk).',
-      expectedBenefits: 'Lowers both personal traffic exhaust exposure and per-trip tailpipe emissions.',
-      estimatedImpact: 'Combining errands and choosing transit cuts per-km commute CO2e by ~65% while reducing roadside NO2 exposure.',
-      confidenceAndLimitations: 'Midday dispersion is typical but can vary during winter temperature inversions or dust events.',
+      expectedBenefits:
+        'Lowers both personal traffic exhaust exposure and per-trip tailpipe emissions.',
+      estimatedImpact:
+        'Combining errands and choosing transit cuts per-km commute CO2e by ~65% while reducing roadside NO2 exposure.',
+      confidenceAndLimitations:
+        'Midday dispersion is typical but can vary during winter temperature inversions or dust events.',
       factBasis: `Wind speed ${wind} km/h; NO2 reading ${snapshot.pollutants.no2 ?? 'N/A'} µg/m³.`,
     },
   ];
@@ -144,9 +149,12 @@ function buildAfternoonSlot(
       what: 'Use a properly fitted N95/FFP2 mask during prolonged outdoor work and take scheduled breaks indoors when feasible.',
       why: 'Cloth or loose surgical masks do not seal tightly against fine PM2.5 particulates.',
       when: 'Throughout outdoor shifts whenever AQI exceeds 150.',
-      expectedBenefits: 'Significantly reduces inhaled particulate matter when outdoor presence is unavoidable.',
-      estimatedImpact: 'Properly sealed N95 respirators filter >=95% of test particulates under standard fit conditions.',
-      confidenceAndLimitations: 'Real-world protection drops if facial seal is compromised; replace masks when damp or soiled.',
+      expectedBenefits:
+        'Significantly reduces inhaled particulate matter when outdoor presence is unavoidable.',
+      estimatedImpact:
+        'Properly sealed N95 respirators filter >=95% of test particulates under standard fit conditions.',
+      confidenceAndLimitations:
+        'Real-world protection drops if facial seal is compromised; replace masks when damp or soiled.',
       factBasis: `CPCB AQI ${aqi} (${snapshot.cpcbCategory}).`,
     });
   }
@@ -163,28 +171,31 @@ function buildAfternoonSlot(
   };
 }
 
-function buildEveningSlot(
-  snapshot: EnvironmentalSnapshot,
-  ctx: RoutineContext
-): RoutineSlot {
+function buildEveningSlot(snapshot: EnvironmentalSnapshot, ctx: RoutineContext): RoutineSlot {
   const { aqi, highRisk, elevated } = ctx;
   const actions: StructuredRecommendation[] = [
     {
       id: 'evening-ventilation',
-      title: aqi <= 100 ? 'Cross-ventilate living spaces briefly' : 'Keep windows closed & dampen dust',
+      title:
+        aqi <= 100 ? 'Cross-ventilate living spaces briefly' : 'Keep windows closed & dampen dust',
       priority: highRisk ? 'High' : 'Moderate',
-      what: aqi <= 100
-        ? 'Open opposite windows for 15–25 minutes before evening traffic peaks to refresh indoor CO2 and cooking odors.'
-        : 'Keep exterior windows and door gaps sealed; use damp mopping instead of dry sweeping and run kitchen exhaust during cooking.',
-      why: aqi <= 100
-        ? 'Outdoor air is within Good/Satisfactory bounds, making natural cross-ventilation effective for lowering indoor CO2 and VOCs.'
-        : 'Evening cooling and rush-hour traffic typically push PM2.5 upward; dry sweeping resuspends settled dust.',
+      what:
+        aqi <= 100
+          ? 'Open opposite windows for 15–25 minutes before evening traffic peaks to refresh indoor CO2 and cooking odors.'
+          : 'Keep exterior windows and door gaps sealed; use damp mopping instead of dry sweeping and run kitchen exhaust during cooking.',
+      why:
+        aqi <= 100
+          ? 'Outdoor air is within Good/Satisfactory bounds, making natural cross-ventilation effective for lowering indoor CO2 and VOCs.'
+          : 'Evening cooling and rush-hour traffic typically push PM2.5 upward; dry sweeping resuspends settled dust.',
       when: '17:30 to 20:30 local time.',
-      expectedBenefits: aqi <= 100
-        ? 'Refreshes indoor oxygen/CO2 balance without elevating indoor PM2.5.'
-        : 'Prevents outdoor smog ingress and indoor dust resuspension.',
-      estimatedImpact: 'Damp cleaning + range hood venting prevents sharp indoor PM2.5 spikes during dinner prep.',
-      confidenceAndLimitations: 'If indoor CO2 rises in sealed rooms, brief targeted ventilation or mechanical filtered air intake is needed.',
+      expectedBenefits:
+        aqi <= 100
+          ? 'Refreshes indoor oxygen/CO2 balance without elevating indoor PM2.5.'
+          : 'Prevents outdoor smog ingress and indoor dust resuspension.',
+      estimatedImpact:
+        'Damp cleaning + range hood venting prevents sharp indoor PM2.5 spikes during dinner prep.',
+      confidenceAndLimitations:
+        'If indoor CO2 rises in sealed rooms, brief targeted ventilation or mechanical filtered air intake is needed.',
       factBasis: `Outdoor PM2.5 is ${snapshot.pollutants.pm25 ?? 'N/A'} µg/m³.`,
     },
   ];
@@ -215,16 +226,21 @@ function buildNightSlot(
     actions: [
       {
         id: 'night-bedroom',
-        title: profile.hasPurifier ? 'Run bedroom HEPA purifier on sleep mode' : 'Prepare clean-air sleep zone',
+        title: profile.hasPurifier
+          ? 'Run bedroom HEPA purifier on sleep mode'
+          : 'Prepare clean-air sleep zone',
         priority: highRisk || hasChildren || hasOlder ? 'High' : 'Moderate',
         what: profile.hasPurifier
           ? 'Set your HEPA purifier to continuous quiet/sleep speed with bedroom doors closed and avoid burning incense or candles.'
           : 'Keep bedroom windows latched during overnight smog hours, wipe bedside surfaces with a damp cloth, and maintain 40–55% relative humidity.',
         why: 'Households spend 7–9 continuous hours in bedrooms overnight while ambient winter smog frequently peaks between midnight and 07:00.',
         when: '21:30 until morning wake-up.',
-        expectedBenefits: 'Supports cleaner overnight breathing environment for children, older adults, and sensitive individuals.',
-        estimatedImpact: 'Maintaining a clean-air bedroom provides 8 hours of reduced particulate exposure daily.',
-        confidenceAndLimitations: 'True HEPA filtration captures particulates (PM2.5/PM10) but not gases (NO2/CO) unless equipped with sufficient activated carbon.',
+        expectedBenefits:
+          'Supports cleaner overnight breathing environment for children, older adults, and sensitive individuals.',
+        estimatedImpact:
+          'Maintaining a clean-air bedroom provides 8 hours of reduced particulate exposure daily.',
+        confidenceAndLimitations:
+          'True HEPA filtration captures particulates (PM2.5/PM10) but not gases (NO2/CO) unless equipped with sufficient activated carbon.',
         factBasis: `Outdoor humidity ${snapshot.weather.humidityPercent ?? 'N/A'}%; tomorrow forecast peak is tracked in Insights.`,
       },
     ],
@@ -267,45 +283,59 @@ export function getInitialIndoorChecklist(): IndoorRoomTask[] {
       id: 'bed-1',
       room: 'Bedroom',
       title: 'Run true-HEPA purifier or seal drafty window gaps overnight',
-      guidance: 'Close bedroom doors and windows during high-AQI nights; place purifier 30–50 cm from walls.',
-      whyItMatters: 'You spend ~33% of your day sleeping in one room; continuous overnight filtration lowers cumulative PM2.5 dose.',
-      limitation: 'HEPA filters trap particles (PM2.5/allergens) but do not remove CO2 or gaseous VOCs without activated carbon + fresh air.',
+      guidance:
+        'Close bedroom doors and windows during high-AQI nights; place purifier 30–50 cm from walls.',
+      whyItMatters:
+        'You spend ~33% of your day sleeping in one room; continuous overnight filtration lowers cumulative PM2.5 dose.',
+      limitation:
+        'HEPA filters trap particles (PM2.5/allergens) but do not remove CO2 or gaseous VOCs without activated carbon + fresh air.',
       completed: false,
     },
     {
       id: 'bed-2',
       room: 'Bedroom',
       title: 'Wash bedding weekly & damp-wipe bedside surfaces',
-      guidance: 'Avoid shaking sheets indoors; wipe headboards and floors with a damp microfiber cloth.',
-      whyItMatters: 'Reduces resuspended coarse dust (PM10) and settled allergens without aerosolizing particles.',
-      limitation: 'Dust control does not address outdoor fine smoke entering through unsealed vents.',
+      guidance:
+        'Avoid shaking sheets indoors; wipe headboards and floors with a damp microfiber cloth.',
+      whyItMatters:
+        'Reduces resuspended coarse dust (PM10) and settled allergens without aerosolizing particles.',
+      limitation:
+        'Dust control does not address outdoor fine smoke entering through unsealed vents.',
       completed: false,
     },
     {
       id: 'liv-1',
       room: 'Living room',
       title: 'Eliminate indoor incense, scented candles, and tobacco smoke',
-      guidance: 'Switch to zero-combustion fragrance-free habits indoors, especially during winter smog.',
-      whyItMatters: 'A single burning incense stick or candle can spike indoor PM2.5 above severe outdoor smog levels in minutes.',
-      limitation: 'Eliminating combustion prevents new spikes but does not clean existing outdoor PM2.5 infiltration.',
+      guidance:
+        'Switch to zero-combustion fragrance-free habits indoors, especially during winter smog.',
+      whyItMatters:
+        'A single burning incense stick or candle can spike indoor PM2.5 above severe outdoor smog levels in minutes.',
+      limitation:
+        'Eliminating combustion prevents new spikes but does not clean existing outdoor PM2.5 infiltration.',
       completed: false,
     },
     {
       id: 'liv-2',
       room: 'Living room',
       title: 'Cross-ventilate only when outdoor AQI <= 100 (or PM2.5 < 35 µg/m³)',
-      guidance: 'Open opposite windows for 15–20 min during midday cleaner air windows; close before evening traffic.',
+      guidance:
+        'Open opposite windows for 15–20 min during midday cleaner air windows; close before evening traffic.',
       whyItMatters: 'Prevents indoor CO2 buildup while avoiding letting heavy outdoor smog inside.',
-      limitation: 'In prolonged Severe AQI episodes (>300), un-filtered ventilation brings in hazardous particulates.',
+      limitation:
+        'In prolonged Severe AQI episodes (>300), un-filtered ventilation brings in hazardous particulates.',
       completed: false,
     },
     {
       id: 'kit-1',
       room: 'Kitchen',
       title: 'Run externally vented range hood before & 15 min after cooking',
-      guidance: 'Use back burners under the hood, cover pans while boiling/frying, and avoid charring oils.',
-      whyItMatters: 'High-heat frying and gas combustion produce intense indoor PM2.5 and NO2 peaks.',
-      limitation: 'Recirculating hoods without external ducts only trap grease and fail to remove NO2 or ultrafine particles.',
+      guidance:
+        'Use back burners under the hood, cover pans while boiling/frying, and avoid charring oils.',
+      whyItMatters:
+        'High-heat frying and gas combustion produce intense indoor PM2.5 and NO2 peaks.',
+      limitation:
+        'Recirculating hoods without external ducts only trap grease and fail to remove NO2 or ultrafine particles.',
       completed: false,
     },
     {
@@ -313,25 +343,32 @@ export function getInitialIndoorChecklist(): IndoorRoomTask[] {
       room: 'Kitchen',
       title: 'Keep indoor humidity between 40% and 55% to prevent mold',
       guidance: 'Fix leaking pipes promptly, wipe condensation, and vent steam outdoors.',
-      whyItMatters: 'Excess humidity (>60%) promotes mold spores and dust mites; overly dry air (<30%) irritates airways.',
-      limitation: 'Dehumidification prevents biological growth but does not filter combustion soot.',
+      whyItMatters:
+        'Excess humidity (>60%) promotes mold spores and dust mites; overly dry air (<30%) irritates airways.',
+      limitation:
+        'Dehumidification prevents biological growth but does not filter combustion soot.',
       completed: false,
     },
     {
       id: 'kid-1',
       room: "Children's room",
       title: 'Prioritize clean-air zone & soft-toy dust control',
-      guidance: 'Store plush toys in closed bins, wet-mop floors daily during high smog, and inspect HVAC/purifier pre-filters monthly.',
-      whyItMatters: 'Children breathe faster per kg of body weight than adults and have developing lungs.',
-      limitation: 'Indoor measures protect home hours only; coordinate with school indoor air practices too.',
+      guidance:
+        'Store plush toys in closed bins, wet-mop floors daily during high smog, and inspect HVAC/purifier pre-filters monthly.',
+      whyItMatters:
+        'Children breathe faster per kg of body weight than adults and have developing lungs.',
+      limitation:
+        'Indoor measures protect home hours only; coordinate with school indoor air practices too.',
       completed: false,
     },
     {
       id: 'wrk-1',
       room: 'Workspace',
       title: 'Schedule HVAC/purifier filter inspection & avoid ozone-generating devices',
-      guidance: 'Vacuum washable pre-filters every 2 weeks, replace HEPA cartridges per manufacturer hours, and never use ionizers/ozone purifiers.',
-      whyItMatters: 'Clogged filters drop Clean Air Delivery Rate (CADR), while ozone generators create lung-irritating ozone.',
+      guidance:
+        'Vacuum washable pre-filters every 2 weeks, replace HEPA cartridges per manufacturer hours, and never use ionizers/ozone purifiers.',
+      whyItMatters:
+        'Clogged filters drop Clean Air Delivery Rate (CADR), while ozone generators create lung-irritating ozone.',
       limitation: 'Filter replacement intervals shorten during heavy winter smog seasons.',
       completed: false,
     },
@@ -345,10 +382,12 @@ export function getInitialLifestyleAlternatives(): LifestyleAlternative[] {
       category: 'Transport',
       title: 'Shift daily solo car/two-wheeler trips to metro or bus',
       currentHabit: 'Solo motorized commute (~12 km/day, 5 days/week = 60 km)',
-      recommendedAlternative: 'Use metro rail or public bus for 3 of 5 weekly commutes (36 km/week)',
+      recommendedAlternative:
+        'Use metro rail or public bus for 3 of 5 weekly commutes (36 km/week)',
       estimatedReductionKgPerWeek: 4.46,
       methodology: 'Baseline (36 km × 0.192 kg CO2e/km) − Transit (36 km × 0.068 kg CO2e/km)',
-      assumptions: 'Medium petrol passenger vehicle baseline; blended urban metro/bus factor (DEFRA 2024).',
+      assumptions:
+        'Medium petrol passenger vehicle baseline; blended urban metro/bus factor (DEFRA 2024).',
       confidenceLevel: 'High',
       adopted: false,
     },
@@ -357,9 +396,11 @@ export function getInitialLifestyleAlternatives(): LifestyleAlternative[] {
       category: 'Transport',
       title: 'Batch multiple neighborhood errands into one consolidated trip',
       currentHabit: '3 separate short car errands/week (~15 km total cold-start driving)',
-      recommendedAlternative: 'Combine errands into 1 planned loop or walk/cycle short legs when AQI <= 100',
+      recommendedAlternative:
+        'Combine errands into 1 planned loop or walk/cycle short legs when AQI <= 100',
       estimatedReductionKgPerWeek: 1.92,
-      methodology: '10 km avoided driving × 0.192 kg CO2e/km (excludes extra cold-start inefficiency)',
+      methodology:
+        '10 km avoided driving × 0.192 kg CO2e/km (excludes extra cold-start inefficiency)',
       assumptions: 'Assumes avoiding 10 km of stop-and-go urban driving weekly.',
       confidenceLevel: 'Moderate',
       adopted: false,
@@ -370,7 +411,7 @@ export function getInitialLifestyleAlternatives(): LifestyleAlternative[] {
       title: 'Share school or office commutes via 2–3 person carpooling',
       currentHabit: '24 km/week single-occupancy school/work drop-offs',
       recommendedAlternative: 'Coordinate alternating neighbor/colleague carpool',
-      estimatedReductionKgPerWeek: 2.30,
+      estimatedReductionKgPerWeek: 2.3,
       methodology: 'Baseline (24 km × 0.192) − Carpool share (24 km × 0.096)',
       assumptions: '2-person shared occupancy; higher occupancy increases per-person savings.',
       confidenceLevel: 'High',
@@ -384,7 +425,8 @@ export function getInitialLifestyleAlternatives(): LifestyleAlternative[] {
       recommendedAlternative: 'Switch to 9W Energy-Star / BEE 5-star LED bulbs',
       estimatedReductionKgPerWeek: 4.81,
       methodology: '6 bulbs × 1.12 kWh saved/week × 0.716 kg CO2e/kWh (India CEA grid)',
-      assumptions: '40W average wattage reduction per bulb, 4 hours/day; varies by local grid carbon intensity.',
+      assumptions:
+        '40W average wattage reduction per bulb, 4 hours/day; varies by local grid carbon intensity.',
       confidenceLevel: 'High',
       adopted: false,
     },
@@ -393,10 +435,12 @@ export function getInitialLifestyleAlternatives(): LifestyleAlternative[] {
       category: 'Energy',
       title: 'Eliminate standby phantom loads & optimize AC/appliance efficiency',
       currentHabit: 'Desktops, TVs, routers, and chargers left idle + AC set at 19°C',
-      recommendedAlternative: 'Use smart power strips, set AC to 24–25°C with ceiling fan, choose 5-star appliances',
+      recommendedAlternative:
+        'Use smart power strips, set AC to 24–25°C with ceiling fan, choose 5-star appliances',
       estimatedReductionKgPerWeek: 7.16,
       methodology: '10 kWh/week saved × 0.716 kg CO2e/kWh (India CEA weighted grid)',
-      assumptions: 'Raising AC setpoint by 2–3°C and cutting standby typically saves 1–1.5 kWh/day in warm months.',
+      assumptions:
+        'Raising AC setpoint by 2–3°C and cutting standby typically saves 1–1.5 kWh/day in warm months.',
       confidenceLevel: 'Moderate',
       adopted: false,
     },
@@ -405,10 +449,13 @@ export function getInitialLifestyleAlternatives(): LifestyleAlternative[] {
       category: 'Household',
       title: 'Compost kitchen organics & stop all leaf/trash burning',
       currentHabit: 'Mixed household waste sent to landfill; occasional garden debris burning',
-      recommendedAlternative: 'Segregate wet waste for composting, reuse packaging, never burn leaves/waste',
-      estimatedReductionKgPerWeek: 3.50,
-      methodology: '5 kg/week diverted waste × 0.70 kg CO2e/kg avoided landfill methane + local PM2.5 elimination',
-      assumptions: 'Average urban household organic fraction; avoiding open burning immediately prevents toxic local smoke.',
+      recommendedAlternative:
+        'Segregate wet waste for composting, reuse packaging, never burn leaves/waste',
+      estimatedReductionKgPerWeek: 3.5,
+      methodology:
+        '5 kg/week diverted waste × 0.70 kg CO2e/kg avoided landfill methane + local PM2.5 elimination',
+      assumptions:
+        'Average urban household organic fraction; avoiding open burning immediately prevents toxic local smoke.',
       confidenceLevel: 'Moderate',
       adopted: false,
     },
@@ -419,8 +466,10 @@ export function getInitialLifestyleAlternatives(): LifestyleAlternative[] {
       currentHabit: '4–5 fragmented single-item express deliveries per week',
       recommendedAlternative: 'Bundle weekly household orders into single scheduled delivery slots',
       estimatedReductionKgPerWeek: 1.15,
-      methodology: 'Estimated 3 avoided last-mile van/scooter dispatches (~2 km allocated share × 0.192 kg/km)',
-      assumptions: 'Indicative range depending on courier fleet type (2-wheeler vs diesel van) and route density.',
+      methodology:
+        'Estimated 3 avoided last-mile van/scooter dispatches (~2 km allocated share × 0.192 kg/km)',
+      assumptions:
+        'Indicative range depending on courier fleet type (2-wheeler vs diesel van) and route density.',
       confidenceLevel: 'Indicative',
       adopted: false,
     },
@@ -461,7 +510,10 @@ export function buildSmartAlerts(snapshot: EnvironmentalSnapshot): SmartAlert[] 
 
   // Check rising PM2.5 in next 6 hours from hourly forecast
   const forecastPoints = snapshot.hourly.filter((h) => h.isForecast).slice(0, 6);
-  const maxForecastPm25 = forecastPoints.reduce((m, p) => (p.pm25 !== null && p.pm25 > m ? p.pm25 : m), 0);
+  const maxForecastPm25 = forecastPoints.reduce(
+    (m, p) => (p.pm25 !== null && p.pm25 > m ? p.pm25 : m),
+    0
+  );
   if (pm25 !== null && maxForecastPm25 > pm25 * 1.25 && maxForecastPm25 > 45) {
     alerts.push({
       id: 'alert-rising',
@@ -514,7 +566,8 @@ export function buildSmartAlerts(snapshot: EnvironmentalSnapshot): SmartAlert[] 
     type: 'filter_maintenance',
     severity: 'Advisory',
     title: 'Monthly Pre-Filter & Exhaust Check',
-    message: 'Check purifier pre-filters and kitchen range hood grease traps to maintain airflow efficiency during urban haze episodes.',
+    message:
+      'Check purifier pre-filters and kitchen range hood grease traps to maintain airflow efficiency during urban haze episodes.',
     actionLabel: 'Room Checklist',
     targetPage: 'indoor',
     timestamp: now,
@@ -526,7 +579,8 @@ export function buildSmartAlerts(snapshot: EnvironmentalSnapshot): SmartAlert[] 
     type: 'sustainability_goal',
     severity: 'Info',
     title: 'Weekly Low-Emission Check-In',
-    message: 'Log car trips replaced by public transit or energy savings to measure your household CO2e impact.',
+    message:
+      'Log car trips replaced by public transit or energy savings to measure your household CO2e impact.',
     actionLabel: 'Open Calculator',
     targetPage: 'calculator',
     timestamp: now,
@@ -561,7 +615,10 @@ function computeShortTermTrend(validHourly: EnvironmentalSnapshot['hourly']): {
   return { trendDirection: 'Stable', trendDeltaPercent };
 }
 
-function assessStagnationRisk(wind: number, humidity: number): {
+function assessStagnationRisk(
+  wind: number,
+  humidity: number
+): {
   stagnationRisk: 'High' | 'Moderate' | 'Low';
   weatherExplanation: string;
 } {
@@ -628,8 +685,12 @@ export function analyzePollutionInsights(snapshot: EnvironmentalSnapshot): {
   return {
     trendDirection,
     trendDeltaPercent,
-    peakWindow: peakPoint ? `${peakPoint.label} (~${peakPoint.pm25} µg/m³ PM2.5)` : 'Insufficient data',
-    cleanestWindow: cleanestPoint ? `${cleanestPoint.label} (~${cleanestPoint.pm25} µg/m³ PM2.5)` : 'Insufficient data',
+    peakWindow: peakPoint
+      ? `${peakPoint.label} (~${peakPoint.pm25} µg/m³ PM2.5)`
+      : 'Insufficient data',
+    cleanestWindow: cleanestPoint
+      ? `${cleanestPoint.label} (~${cleanestPoint.pm25} µg/m³ PM2.5)`
+      : 'Insufficient data',
     stagnationRisk,
     weatherExplanation,
     categoryDistribution: computeCategoryDistribution(valid),

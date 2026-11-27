@@ -63,8 +63,8 @@ export function resolveQueriedLocation(params: QueriedLocationParams): CityLocat
   };
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirPath = path.dirname(currentFilePath);
 
 const rawPort = Number(process.env.PORT ?? 3000);
 const PORT = Number.isInteger(rawPort) && rawPort >= 1 && rawPort <= 65535 ? rawPort : 3000;
@@ -354,7 +354,7 @@ async function startServer() {
     viteServer = vite;
     app.use(vite.middlewares);
   } else {
-    const distPath = path.resolve(__dirname, 'dist');
+    const distPath = path.resolve(currentDirPath, 'dist');
     if (fs.existsSync(distPath)) {
       app.use(express.static(distPath));
       app.get('*', (_req, res) => {
@@ -399,7 +399,7 @@ async function startServer() {
 
 // Only start listening when executed as entrypoint, not when imported by integration tests
 const isMainModule =
-  process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
+  process.argv[1] && path.resolve(process.argv[1]) === path.resolve(currentFilePath);
 if (isMainModule) {
   startServer();
 }

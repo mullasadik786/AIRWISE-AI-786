@@ -1,11 +1,10 @@
-import { escapeCsvCell } from './format.ts';
+import { escapeCsvCell, stripControlCharacters } from './format.ts';
 
 /**
  * Sanitizes a download filename to remove path separators, traversal sequences, and control chars.
  */
 export function sanitizeFilename(filename: string): string {
-  const cleaned = filename
-    .replace(/[\u0000-\u001F\u007F]/g, '')
+  const cleaned = stripControlCharacters(filename, '')
     .replace(/[\\/]+/g, '_')
     .replace(/\.\.+/g, '.')
     .trim();

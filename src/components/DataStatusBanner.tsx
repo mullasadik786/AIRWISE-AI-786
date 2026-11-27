@@ -9,8 +9,7 @@ interface DataStatusBannerProps {
 }
 
 export function DataStatusBanner({ snapshot, loading, onRefresh }: DataStatusBannerProps) {
-  const isInitialConnecting =
-    loading && snapshot.statusMessage.startsWith('Connecting to live');
+  const isInitialConnecting = loading && snapshot.statusMessage.startsWith('Connecting to live');
   const isDemo = !isInitialConnecting && snapshot.dataStatus === 'DEMO_FALLBACK';
   const isUnavailable = !isInitialConnecting && snapshot.dataStatus === 'UNAVAILABLE';
   const isCached = !isInitialConnecting && snapshot.dataStatus === 'CACHED';
@@ -30,7 +29,10 @@ export function DataStatusBanner({ snapshot, loading, onRefresh }: DataStatusBan
     >
       <div className="flex items-start gap-3">
         {isInitialConnecting ? (
-          <RefreshCw className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-sky-600" aria-hidden="true" />
+          <RefreshCw
+            className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-sky-600"
+            aria-hidden="true"
+          />
         ) : isDemo || isUnavailable ? (
           <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" aria-hidden="true" />
         ) : isCached ? (

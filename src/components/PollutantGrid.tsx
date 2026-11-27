@@ -79,7 +79,9 @@ export function PollutantGrid({ pollutants, whoRatios }: PollutantGridProps) {
               <p className="mt-2 font-mono text-2xl font-bold text-[#102A43] tabular-nums">
                 {p.value !== null ? p.value : 'N/A'}
               </p>
-              <p className={`mt-1 text-[11px] ${exceedsWho ? 'font-medium text-amber-900' : 'text-slate-600'}`}>
+              <p
+                className={`mt-1 text-[11px] ${exceedsWho ? 'font-medium text-amber-900' : 'text-slate-600'}`}
+              >
                 WHO: {p.whoLimit} {p.unit}
                 {p.ratio !== null ? ` (${p.ratio}x)` : ''}
               </p>

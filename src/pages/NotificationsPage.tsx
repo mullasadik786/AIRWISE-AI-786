@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { Bell, CheckCheck, SlidersHorizontal } from 'lucide-react';
 import type { AlertPreferences, PageId, SmartAlert } from '../types/airwise.ts';
 import { formatSafeTime } from '../lib/format.ts';
 import { filterAlertsByPreferences } from '../lib/recommendations.ts';
 import { ALERT_SEVERITY_STYLES } from '../lib/statusStyles.ts';
+import { useTimedStatus } from '../hooks/useTimedStatus.ts';
 
 interface NotificationsPageProps {
   alerts: SmartAlert[];
@@ -22,22 +22,22 @@ export function NotificationsPage({
   onUpdatePreferences,
   onNavigate,
 }: NotificationsPageProps) {
-  const [statusMessage, setStatusMessage] = useState('');
+  const { status: statusMessage, showStatus } = useTimedStatus(3000);
 
   function togglePref(key: keyof AlertPreferences, label: string) {
     const nextValue = !preferences[key];
     onUpdatePreferences({ ...preferences, [key]: nextValue });
-    setStatusMessage(`${label} ${nextValue ? 'enabled' : 'muted'}.`);
+    showStatus(`${label} ${nextValue ? 'enabled' : 'muted'}.`);
   }
 
   function handleMarkRead(alert: SmartAlert) {
     onMarkRead(alert.id);
-    setStatusMessage(`Marked "${alert.title}" as read.`);
+    showStatus(`Marked "${alert.title}" as read.`);
   }
 
   function handleMarkAllRead() {
     onMarkAllRead();
-    setStatusMessage('All visible alerts marked as read.');
+    showStatus('All visible alerts marked as read.');
   }
 
   const prefItems: Array<{ key: keyof AlertPreferences; label: string; description: string }> = [
@@ -78,7 +78,7 @@ export function NotificationsPage({
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {statusMessage}
+        {statusMessage?.text ?? ''}
       </div>
 
       <section className="space-y-4 lg:col-span-7" aria-label="Active Alerts">
@@ -117,7 +117,9 @@ export function NotificationsPage({
                 }`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className={`rounded-md border px-2 py-0.5 text-[11px] font-semibold ${sevStyle}`}>
+                  <span
+                    className={`rounded-md border px-2 py-0.5 text-[11px] font-semibold ${sevStyle}`}
+                  >
                     {alert.severity}
                   </span>
                   <span className="font-mono text-[11px] text-slate-600">
@@ -125,7 +127,9 @@ export function NotificationsPage({
                   </span>
                 </div>
 
-                <h3 className="mt-2 font-display text-base font-bold text-[#102A43]">{alert.title}</h3>
+                <h3 className="mt-2 font-display text-base font-bold text-[#102A43]">
+                  {alert.title}
+                </h3>
                 <p className="mt-1 text-sm text-slate-600">{alert.message}</p>
 
                 <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -153,7 +157,10 @@ export function NotificationsPage({
       </section>
 
       {/* Alert Configuration */}
-      <section className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6 lg:col-span-5" aria-label="Notification Rules">
+      <section
+        className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6 lg:col-span-5"
+        aria-label="Notification Rules"
+      >
         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
           <SlidersHorizontal className="h-4 w-4 text-emerald-700" aria-hidden="true" />
           <h2 className="font-display text-base font-bold text-[#102A43]">
@@ -164,19 +171,26 @@ export function NotificationsPage({
         <div className="mt-4 space-y-4">
           {prefItems.map((item) => {
             const checked = preferences[item.key];
+            const inputId = `alert-pref-${item.key}`;
             return (
-              <label key={item.key} className="flex items-start justify-between gap-3 cursor-pointer">
-                <div>
-                  <span className="block text-sm font-semibold text-[#102A43]">{item.label}</span>
-                  <span className="block text-xs text-slate-600">{item.description}</span>
-                </div>
+              <div key={item.key} className="flex items-start justify-between gap-3">
+                <label
+                  htmlFor={inputId}
+                  className="flex-1 cursor-pointer text-sm font-semibold text-[#102A43]"
+                >
+                  {item.label}
+                  <span className="block text-xs font-normal text-slate-600">
+                    {item.description}
+                  </span>
+                </label>
                 <input
+                  id={inputId}
                   type="checkbox"
                   checked={checked}
                   onChange={() => togglePref(item.key, item.label)}
                   className="mt-1 h-4 w-4 rounded border-slate-300 accent-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8]"
                 />
-              </label>
+              </div>
             );
           })}
         </div>

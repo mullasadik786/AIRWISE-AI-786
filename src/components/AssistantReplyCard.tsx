@@ -11,11 +11,7 @@ interface AssistantReplyCardProps {
 /**
  * Renders a user question paired with the structured, fact-grounded assistant response.
  */
-export function AssistantReplyCard({
-  exchange,
-  copied,
-  onCopy,
-}: AssistantReplyCardProps) {
+export function AssistantReplyCard({ exchange, copied, onCopy }: AssistantReplyCardProps) {
   return (
     <div className="space-y-3">
       {/* User Question */}

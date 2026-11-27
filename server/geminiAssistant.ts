@@ -1,9 +1,4 @@
-import {
-  GoogleGenAI,
-  ThinkingLevel,
-  Type,
-  type GenerateContentParameters,
-} from '@google/genai';
+import { GoogleGenAI, ThinkingLevel, Type, type GenerateContentParameters } from '@google/genai';
 import type { AssistantStructuredReply } from '../src/types/airwise.ts';
 import {
   AssistantOutputSchema,
@@ -60,7 +55,8 @@ function buildFallbackAssistantReply(
       when: isHigh
         ? 'Immediate precautions through tonight; recheck hourly trends before morning commutes.'
         : 'Apply during morning and evening rush hours when emissions typically peak.',
-      expectedBenefits: 'Lowers peak particulate inhalation while keeping daily household routines practical.',
+      expectedBenefits:
+        'Lowers peak particulate inhalation while keeping daily household routines practical.',
       estimatedImpact: isHigh
         ? 'High personal exposure reduction when shifting intense outdoor exercise indoors and avoiding roadside fumes.'
         : 'Moderate daily exposure reduction through route selection and cleaner indoor habits.',
@@ -93,9 +89,30 @@ function isTransientError(err: unknown): boolean {
   return /429|503|500|timeout|network|ECONNRESET/i.test(msg);
 }
 
+const GEMINI_REQUEST_TIMEOUT_MS = 12_000;
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error('Gemini assistant request timeout'));
+    }, timeoutMs);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err: unknown) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
+}
+
 export async function generateAssistantAdvice(
   payload: AssistantPayload,
-  injectedClient?: GeminiClientLike
+  injectedClient?: GeminiClientLike,
+  requestTimeoutMs: number = GEMINI_REQUEST_TIMEOUT_MS
 ): Promise<AssistantStructuredReply> {
   const { sanitized, flagged } = sanitizeUserPrompt(payload.question);
   if (flagged) {
@@ -106,7 +123,9 @@ export async function generateAssistantAdvice(
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
-  const hasValidKey = Boolean(apiKey && apiKey !== 'MY_GEMINI_API_KEY' && apiKey.trim().length >= 10);
+  const hasValidKey = Boolean(
+    apiKey && apiKey !== 'MY_GEMINI_API_KEY' && apiKey.trim().length >= 10
+  );
   if (!injectedClient && !hasValidKey) {
     return buildFallbackAssistantReply(payload);
   }
@@ -117,6 +136,7 @@ export async function generateAssistantAdvice(
       new GoogleGenAI({
         apiKey,
         httpOptions: {
+          timeout: GEMINI_REQUEST_TIMEOUT_MS,
           headers: {
             'User-Agent': 'aistudio-build',
           },
@@ -215,15 +235,15 @@ export async function generateAssistantAdvice(
 
     let response: { text?: string };
     try {
-      response = await ai.models.generateContent(requestParams);
+      response = await withTimeout(ai.models.generateContent(requestParams), requestTimeoutMs);
     } catch (firstErr) {
       if (!isTransientError(firstErr)) throw firstErr;
       await new Promise((resolve) => setTimeout(resolve, 250));
-      response = await ai.models.generateContent(requestParams);
+      response = await withTimeout(ai.models.generateContent(requestParams), requestTimeoutMs);
     }
 
     const rawText = (response.text ?? '').trim();
-    const parsed = JSON.parse(rawText);
+    const parsed: unknown = JSON.parse(rawText);
     const validated = AssistantOutputSchema.parse(parsed);
 
     return {
@@ -231,7 +251,10 @@ export async function generateAssistantAdvice(
       source: 'gemini-4-hydrogen',
     };
   } catch (err) {
-    console.warn('Gemini assistant fallback activated:', err instanceof Error ? err.message : 'error');
+    console.warn(
+      'Gemini assistant fallback activated:',
+      err instanceof Error ? err.message : 'error'
+    );
     return buildFallbackAssistantReply(payload);
   }
 }

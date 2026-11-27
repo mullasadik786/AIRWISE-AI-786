@@ -7,6 +7,7 @@ import type {
   IndoorRoomTask,
   LifestyleAlternative,
   PageId,
+  RoutineSlot,
   SmartAlert,
 } from '../types/airwise.ts';
 import { buildDemoFallbackSnapshot, PRESET_CITIES } from '../data/presets.ts';
@@ -18,113 +19,40 @@ import {
 import type { CarbonCalculatorInput } from '../lib/impact.ts';
 import { calculateCarbonImpact } from '../lib/impact.ts';
 import { fetchAirQualitySnapshot } from '../lib/airQualityClient.ts';
-import { hasUnsafeObjectKeys, PersistedStateSchema } from '../lib/validation.ts';
+import {
+  clearPersistedState,
+  DEFAULT_ALERT_PREFS,
+  DEFAULT_CALC_INPUT,
+  DEFAULT_PROFILE,
+  loadPersistedState,
+  parseHashPage,
+  parsePersistedStateJson,
+  resolveInitialPage,
+  savePersistedState,
+  type PersistedState,
+} from '../lib/storage.ts';
 
-const STORAGE_KEY = 'airwise_ai_state_v1';
-
-export const DEFAULT_PROFILE: FamilyProfile = {
-  householdSize: 3,
-  groups: ['adults', 'children', 'dailyCommuters'],
-  preferredStandard: 'CPCB',
-  hasPurifier: true,
-  gridRegion: 'INDIA',
-};
-
-export const DEFAULT_CALC_INPUT: CarbonCalculatorInput = {
-  carKmReplacedByTransitPerWeek: 30,
-  carKmCarpoolPerWeek: 16,
-  carKmReplacedByWalkCyclePerWeek: 8,
-  electricitySavedKwhPerWeek: 10,
-  ledBulbsReplacedCount: 4,
-  wasteReducedKgPerWeek: 3,
-  gridRegion: 'INDIA',
-  householdSize: 3,
-};
-
-export const DEFAULT_ALERT_PREFS: AlertPreferences = {
-  severeAqi: true,
-  risingPm25: true,
-  forecastAlerts: true,
-  ventilationWindows: true,
-  filterMaintenance: true,
-  sustainabilityGoals: true,
-};
-
-const VALID_PAGES: readonly PageId[] = [
-  'landing',
-  'dashboard',
-  'assistant',
-  'routine',
-  'indoor',
-  'sustainability',
-  'calculator',
-  'insights',
-  'community',
-  'notifications',
-  'settings',
-];
-
-interface PersistedState {
-  locationId?: string;
-  customLocation?: CityLocation;
-  profile?: FamilyProfile;
-  completedTaskIds?: string[];
-  completedRoutinePeriods?: Array<'Morning' | 'Afternoon' | 'Evening' | 'Night'>;
-  adoptedHabitIds?: string[];
-  joinedChallengeIds?: string[];
-  readAlertIds?: string[];
-  calcInput?: CarbonCalculatorInput;
-  alertPrefs?: AlertPreferences;
-}
-
-/**
- * Safely parses and validates serialized localStorage state, rejecting prototype-pollution keys.
- */
-export function parsePersistedStateJson(raw: string | null): PersistedState {
-  if (!raw || raw.length > 64 * 1024) return {};
-  try {
-    const json: unknown = JSON.parse(raw);
-    if (hasUnsafeObjectKeys(json)) return {};
-    const parsed = PersistedStateSchema.safeParse(json);
-    return parsed.success ? parsed.data : {};
-  } catch {
-    return {};
-  }
-}
-
-function loadPersistedState(): PersistedState {
-  try {
-    return parsePersistedStateJson(localStorage.getItem(STORAGE_KEY));
-  } catch {
-    return {};
-  }
-}
-
-function isValidPageId(value: string): value is PageId {
-  return VALID_PAGES.some((page) => page === value);
-}
-
-function parseHashPage(): PageId | null {
-  const hash = window.location.hash.replace('#', '');
-  return isValidPageId(hash) ? hash : null;
-}
+export { DEFAULT_ALERT_PREFS, DEFAULT_CALC_INPUT, DEFAULT_PROFILE, parsePersistedStateJson };
 
 export function useAirwiseState() {
   const initialPersisted = useMemo(() => loadPersistedState(), []);
 
-  const [activePage, setActivePage] = useState<PageId>(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('autostart') === '1') return 'dashboard';
-    return parseHashPage() ?? 'landing';
-  });
+  const [activePage, setActivePage] = useState<PageId>(() => resolveInitialPage());
 
-  const [location, setLocation] = useState<CityLocation>(() => {
-    if (initialPersisted.customLocation) return initialPersisted.customLocation;
-    if (initialPersisted.locationId) {
-      return PRESET_CITIES.find((c) => c.id === initialPersisted.locationId) ?? PRESET_CITIES[0];
+  const [feedRequest, setFeedRequest] = useState<{ location: CityLocation; nonce: number }>(() => {
+    if (initialPersisted.customLocation) {
+      return { location: initialPersisted.customLocation, nonce: 0 };
     }
-    return PRESET_CITIES[0];
+    if (initialPersisted.locationId) {
+      return {
+        location:
+          PRESET_CITIES.find((c) => c.id === initialPersisted.locationId) ?? PRESET_CITIES[0],
+        nonce: 0,
+      };
+    }
+    return { location: PRESET_CITIES[0], nonce: 0 };
   });
+  const location = feedRequest.location;
 
   const [snapshot, setSnapshot] = useState<EnvironmentalSnapshot>(() =>
     buildDemoFallbackSnapshot(location, 'Connecting to live environmental telemetry...')
@@ -152,41 +80,42 @@ export function useAirwiseState() {
     initialPersisted.alertPrefs ?? DEFAULT_ALERT_PREFS
   );
   const [completedRoutinePeriods, setCompletedRoutinePeriods] = useState<
-    Array<'Morning' | 'Afternoon' | 'Evening' | 'Night'>
+    Array<RoutineSlot['period']>
   >(initialPersisted.completedRoutinePeriods ?? []);
   const [readAlertIds, setReadAlertIds] = useState<string[]>(initialPersisted.readAlertIds ?? []);
 
   const fetchControllerRef = useRef<AbortController | null>(null);
 
-  const fetchSnapshot = useCallback(async (targetLoc: CityLocation) => {
+  useEffect(() => {
     fetchControllerRef.current?.abort();
     const controller = new AbortController();
     fetchControllerRef.current = controller;
+    const targetLocation = feedRequest.location;
 
-    setLoadingFeed(true);
-    try {
-      const nextSnapshot = await fetchAirQualitySnapshot(targetLoc, controller.signal);
-      if (!controller.signal.aborted) {
-        setSnapshot(nextSnapshot);
+    void (async () => {
+      try {
+        const nextSnapshot = await fetchAirQualitySnapshot(targetLocation, controller.signal);
+        if (!controller.signal.aborted) {
+          setSnapshot(nextSnapshot);
+        }
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return;
+        }
+        if (!controller.signal.aborted) {
+          setSnapshot(buildDemoFallbackSnapshot(targetLocation));
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoadingFeed(false);
+        }
       }
-    } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') {
-        return;
-      }
-      setSnapshot(buildDemoFallbackSnapshot(targetLoc));
-    } finally {
-      if (!controller.signal.aborted) {
-        setLoadingFeed(false);
-      }
-    }
-  }, []);
+    })();
 
-  useEffect(() => {
-    void fetchSnapshot(location);
     return () => {
-      fetchControllerRef.current?.abort();
+      controller.abort();
     };
-  }, [location, fetchSnapshot]);
+  }, [feedRequest]);
 
   useEffect(() => {
     const onHashChange = () => {
@@ -224,15 +153,13 @@ export function useAirwiseState() {
   );
 
   const latestPayloadRef = useRef<PersistedState>(persistedPayload);
-  latestPayloadRef.current = persistedPayload;
+  useEffect(() => {
+    latestPayloadRef.current = persistedPayload;
+  }, [persistedPayload]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(latestPayloadRef.current));
-      } catch {
-        // Ignore storage quota errors
-      }
+      savePersistedState(persistedPayload);
     }, 150);
     return () => {
       clearTimeout(timer);
@@ -241,11 +168,7 @@ export function useAirwiseState() {
 
   useEffect(() => {
     return () => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(latestPayloadRef.current));
-      } catch {
-        // Ignore storage quota errors
-      }
+      savePersistedState(latestPayloadRef.current);
     };
   }, []);
 
@@ -285,8 +208,9 @@ export function useAirwiseState() {
   const calcResult = useMemo(() => calculateCarbonImpact(calcInput), [calcInput]);
 
   const handleClearAllData = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
-    setLocation(PRESET_CITIES[0]);
+    clearPersistedState();
+    setLoadingFeed(true);
+    setFeedRequest((prev) => ({ location: PRESET_CITIES[0], nonce: prev.nonce + 1 }));
     setProfile(DEFAULT_PROFILE);
     setIndoorTasks(getInitialIndoorChecklist());
     setCompletedRoutinePeriods([]);
@@ -320,8 +244,14 @@ export function useAirwiseState() {
   );
 
   const refreshFeed = useCallback(() => {
-    void fetchSnapshot(location);
-  }, [fetchSnapshot, location]);
+    setLoadingFeed(true);
+    setFeedRequest((prev) => ({ location: prev.location, nonce: prev.nonce + 1 }));
+  }, []);
+
+  const selectLocation = useCallback((nextLoc: CityLocation) => {
+    setLoadingFeed(true);
+    setFeedRequest((prev) => ({ location: nextLoc, nonce: prev.nonce + 1 }));
+  }, []);
 
   const toggleIndoorTask = useCallback((id: string) => {
     setIndoorTasks((prev) =>
@@ -330,9 +260,7 @@ export function useAirwiseState() {
   }, []);
 
   const toggleAdoptedHabit = useCallback((id: string) => {
-    setAlternatives((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, adopted: !a.adopted } : a))
-    );
+    setAlternatives((prev) => prev.map((a) => (a.id === id ? { ...a, adopted: !a.adopted } : a)));
   }, []);
 
   const toggleJoinChallenge = useCallback((id: string) => {
@@ -343,14 +271,11 @@ export function useAirwiseState() {
 
   const resetCalcInput = useCallback(() => setCalcInput(DEFAULT_CALC_INPUT), []);
 
-  const toggleRoutinePeriod = useCallback(
-    (period: 'Morning' | 'Afternoon' | 'Evening' | 'Night') => {
-      setCompletedRoutinePeriods((prev) =>
-        prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-      );
-    },
-    []
-  );
+  const toggleRoutinePeriod = useCallback((period: RoutineSlot['period']) => {
+    setCompletedRoutinePeriods((prev) =>
+      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+    );
+  }, []);
 
   const markAlertRead = useCallback((id: string) => {
     setReadAlertIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -364,7 +289,7 @@ export function useAirwiseState() {
     activePage,
     navigate,
     location,
-    setLocation,
+    setLocation: selectLocation,
     snapshot,
     loadingFeed,
     refreshFeed,

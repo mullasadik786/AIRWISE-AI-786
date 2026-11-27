@@ -14,13 +14,18 @@ test('calculateCarbonImpact applies Baseline - Alternative formula accurately', 
     householdSize: 2,
   });
 
-  const expectedTransitSavings = 50 * (EMISSION_FACTORS.CAR_PETROL_KG_PER_KM - EMISSION_FACTORS.PUBLIC_TRANSIT_KG_PER_KM);
+  const expectedTransitSavings =
+    50 * (EMISSION_FACTORS.CAR_PETROL_KG_PER_KM - EMISSION_FACTORS.PUBLIC_TRANSIT_KG_PER_KM);
   const expectedActiveSavings = 10 * EMISSION_FACTORS.CAR_PETROL_KG_PER_KM;
   const expectedPowerSavings = 10 * EMISSION_FACTORS.GRID_INDIA_KG_PER_KWH;
-  const expectedWeekly = Math.round((expectedTransitSavings + expectedActiveSavings + expectedPowerSavings) * 100) / 100;
+  const expectedWeekly =
+    Math.round((expectedTransitSavings + expectedActiveSavings + expectedPowerSavings) * 100) / 100;
 
   assert.equal(res.weeklySavingsKg, expectedWeekly);
-  assert.equal(res.weeklySavingsKg, Math.round((res.weeklyBaselineKg - res.weeklyAlternativeKg) * 100) / 100);
+  assert.equal(
+    res.weeklySavingsKg,
+    Math.round((res.weeklyBaselineKg - res.weeklyAlternativeKg) * 100) / 100
+  );
   assert.ok(res.annualSavingsKg > res.monthlySavingsKg);
   assert.ok(res.exposureVsCarbonNote.includes('personal exposure reduction'));
 });

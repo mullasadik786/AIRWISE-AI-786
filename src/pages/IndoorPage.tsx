@@ -72,11 +72,16 @@ export function IndoorPage({ snapshot, tasks, onToggleTask }: IndoorPageProps) {
 
           <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50/70 p-3.5 text-xs text-amber-950">
             <div className="flex items-start gap-2">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
+              <AlertTriangle
+                className="mt-0.5 h-4 w-4 shrink-0 text-amber-700"
+                aria-hidden="true"
+              />
               <div>
                 <p className="font-semibold">Scientific Note on Indoor Plants</p>
                 <p className="mt-0.5">
-                  Indoor houseplants support wellbeing, but controlled chamber studies show plants alone cannot remove dangerous PM2.5 particulates or winter smog at realistic home air-exchange rates. Use true HEPA filtration and source control instead.
+                  Indoor houseplants support wellbeing, but controlled chamber studies show plants
+                  alone cannot remove dangerous PM2.5 particulates or winter smog at realistic home
+                  air-exchange rates. Use true HEPA filtration and source control instead.
                 </p>
               </div>
             </div>
@@ -134,9 +139,14 @@ export function IndoorPage({ snapshot, tasks, onToggleTask }: IndoorPageProps) {
             Room-by-Room Clean Air Execution
           </h3>
           <p className="mt-1 text-xs text-slate-600">
-            Select a room below to review tailored filtration, ventilation, damp cleaning, and humidity guidance along with practical limitations.
+            Select a room below to review tailored filtration, ventilation, damp cleaning, and
+            humidity guidance along with practical limitations.
           </p>
-          <div className="mt-3 flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Filter checklist by room">
+          <div
+            className="mt-3 flex flex-wrap items-center gap-1.5"
+            role="tablist"
+            aria-label="Filter checklist by room"
+          >
             {ROOM_FILTERS.map((room, idx) => {
               const active = selectedRoom === room;
               const tabProps = getTabProps(room, idx, 'indoor-room');
@@ -147,7 +157,9 @@ export function IndoorPage({ snapshot, tasks, onToggleTask }: IndoorPageProps) {
                   {...tabProps}
                   onClick={() => setSelectedRoom(room)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
-                    active ? 'bg-[#102A43] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    active
+                      ? 'bg-[#102A43] text-white'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   {room}
@@ -165,10 +177,7 @@ export function IndoorPage({ snapshot, tasks, onToggleTask }: IndoorPageProps) {
         aria-label={`${selectedRoom} indoor air tasks`}
       >
         {visibleTasks.map((task) => (
-          <div
-            key={task.id}
-            className="rounded-xl border border-slate-200 bg-white p-5"
-          >
+          <div key={task.id} className="rounded-xl border border-slate-200 bg-white p-5">
             <div className="flex items-start gap-3">
               <button
                 type="button"

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { Download, Lock, Trash2, Upload, Users } from 'lucide-react';
 import type { AlertPreferences, FamilyProfile, HouseholdGroup } from '../types/airwise.ts';
 import type { CarbonCalculatorInput } from '../lib/impact.ts';
 import { downloadTextFile } from '../lib/download.ts';
 import { clampFiniteInt, parseAqiStandard, parseGridRegion } from '../lib/format.ts';
 import { hasUnsafeObjectKeys, PersistedStateSchema } from '../lib/validation.ts';
+import { useTimedStatus } from '../hooks/useTimedStatus.ts';
 
 interface SettingsPageProps {
   profile: FamilyProfile;
@@ -22,16 +23,36 @@ interface SettingsPageProps {
 const GROUP_OPTIONS: Array<{ id: HouseholdGroup; label: string; hint: string }> = [
   { id: 'adults', label: 'Adults', hint: 'General everyday exposure & transit guidance' },
   { id: 'children', label: 'Children', hint: 'Stricter outdoor play & classroom air thresholds' },
-  { id: 'olderAdults', label: 'Older adults', hint: 'Prioritizes calm indoor rest during smog episodes' },
+  {
+    id: 'olderAdults',
+    label: 'Older adults',
+    hint: 'Prioritizes calm indoor rest during smog episodes',
+  },
   {
     id: 'respiratorySensitivities',
     label: 'People with respiratory sensitivities',
     hint: 'Early precaution triggers at Moderate AQI levels',
   },
-  { id: 'outdoorWorkers', label: 'Outdoor workers', hint: 'Respirator & break scheduling guidance' },
-  { id: 'fitnessEnthusiasts', label: 'Fitness enthusiasts', hint: 'Cardio intensity & indoor workout shifts' },
-  { id: 'workFromHome', label: 'Work-from-home individuals', hint: 'Workspace airflow & midday window tips' },
-  { id: 'dailyCommuters', label: 'Daily commuters', hint: 'Low-traffic routing & closed-cabin transit advice' },
+  {
+    id: 'outdoorWorkers',
+    label: 'Outdoor workers',
+    hint: 'Respirator & break scheduling guidance',
+  },
+  {
+    id: 'fitnessEnthusiasts',
+    label: 'Fitness enthusiasts',
+    hint: 'Cardio intensity & indoor workout shifts',
+  },
+  {
+    id: 'workFromHome',
+    label: 'Work-from-home individuals',
+    hint: 'Workspace airflow & midday window tips',
+  },
+  {
+    id: 'dailyCommuters',
+    label: 'Daily commuters',
+    hint: 'Low-traffic routing & closed-cabin transit advice',
+  },
 ];
 
 export function SettingsPage({
@@ -43,27 +64,12 @@ export function SettingsPage({
   onClearAllData,
 }: SettingsPageProps) {
   const [confirmClear, setConfirmClear] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<{ text: string; isError: boolean } | null>(null);
-  const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { status: statusMessage, showStatus } = useTimedStatus(3500);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
-    };
-  }, []);
-
-  function showStatus(text: string, isError = false) {
-    setStatusMessage({ text, isError });
-    if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
-    statusTimerRef.current = setTimeout(() => setStatusMessage(null), 3500);
-  }
 
   function toggleGroup(group: HouseholdGroup) {
     const exists = profile.groups.includes(group);
-    const groups = exists
-      ? profile.groups.filter((g) => g !== group)
-      : [...profile.groups, group];
+    const groups = exists ? profile.groups.filter((g) => g !== group) : [...profile.groups, group];
     onUpdateProfile({ ...profile, groups });
   }
 
@@ -98,7 +104,10 @@ export function SettingsPage({
         return;
       }
       const parsed = PersistedStateSchema.safeParse(json);
-      if (!parsed.success || (!parsed.data.profile && !parsed.data.calcInput && !parsed.data.alertPrefs)) {
+      if (
+        !parsed.success ||
+        (!parsed.data.profile && !parsed.data.calcInput && !parsed.data.alertPrefs)
+      ) {
         showStatus('Invalid AIRWISE preferences JSON format.', true);
         return;
       }
@@ -130,7 +139,8 @@ export function SettingsPage({
               Voluntary Household Protection Profile
             </h2>
             <p className="text-xs text-slate-600">
-              Select applicable groups to personalize your Daily Routine and AI Assistant guidance. No names, ages, or medical records are collected.
+              Select applicable groups to personalize your Daily Routine and AI Assistant guidance.
+              No names, ages, or medical records are collected.
             </p>
           </div>
         </div>
@@ -138,24 +148,26 @@ export function SettingsPage({
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {GROUP_OPTIONS.map((opt) => {
             const active = profile.groups.includes(opt.id);
+            const checkboxId = `pref-group-${opt.id}`;
             return (
-              <label
+              <div
                 key={opt.id}
-                className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 transition-colors ${
+                className={`flex items-start gap-3 rounded-lg border p-3.5 transition-colors ${
                   active ? 'border-[#102A43] bg-[#F4F8FB]' : 'border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 <input
+                  id={checkboxId}
                   type="checkbox"
                   checked={active}
                   onChange={() => toggleGroup(opt.id)}
                   className="mt-1 h-4 w-4 rounded border-slate-300 accent-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8]"
                 />
-                <div>
-                  <span className="block text-sm font-semibold text-[#102A43]">{opt.label}</span>
-                  <span className="block text-xs text-slate-600">{opt.hint}</span>
-                </div>
-              </label>
+                <label htmlFor={checkboxId} className="flex-1 cursor-pointer">
+                  {opt.label}
+                  <span className="block text-xs font-normal text-slate-600">{opt.hint}</span>
+                </label>
+              </div>
             );
           })}
         </div>
@@ -222,15 +234,21 @@ export function SettingsPage({
           </div>
 
           <div className="flex items-end">
-            <label className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg border border-slate-200 px-3 py-2.5">
+            <div className="flex w-full items-center gap-2.5 rounded-lg border border-slate-200 px-3 py-2.5">
               <input
+                id="pref-hepa-purifier"
                 type="checkbox"
                 checked={profile.hasPurifier}
                 onChange={(e) => onUpdateProfile({ ...profile, hasPurifier: e.target.checked })}
                 className="h-4 w-4 rounded border-slate-300 accent-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8]"
               />
-              <span className="text-xs font-semibold text-[#102A43]">Home uses HEPA purifier</span>
-            </label>
+              <label
+                htmlFor="pref-hepa-purifier"
+                className="cursor-pointer text-xs font-semibold text-[#102A43]"
+              >
+                Home uses HEPA purifier
+              </label>
+            </div>
           </div>
         </div>
       </section>
@@ -246,16 +264,20 @@ export function SettingsPage({
 
         <ul className="mt-4 list-disc space-y-2 pl-5 text-xs leading-relaxed text-slate-600">
           <li>
-            <strong>No unnecessary personal data:</strong> AIRWISE AI never requires accounts, phone numbers, exact street addresses, or medical records.
+            <strong>No unnecessary personal data:</strong> AIRWISE AI never requires accounts, phone
+            numbers, exact street addresses, or medical records.
           </li>
           <li>
-            <strong>Permission-based location:</strong> Browser geolocation is only requested when you explicitly click &ldquo;Use My Location&rdquo;.
+            <strong>Permission-based location:</strong> Browser geolocation is only requested when
+            you explicitly click &ldquo;Use My Location&rdquo;.
           </li>
           <li>
-            <strong>Server-side AI & API handling:</strong> All Gemini AI and environmental feed requests execute on the backend server; API keys are never exposed to the browser.
+            <strong>Server-side AI & API handling:</strong> All Gemini AI and environmental feed
+            requests execute on the backend server; API keys are never exposed to the browser.
           </li>
           <li>
-            <strong>Local-only preferences:</strong> Your household group selections, indoor checklist progress, and calculator inputs stay in your browser&apos;s local storage.
+            <strong>Local-only preferences:</strong> Your household group selections, indoor
+            checklist progress, and calculator inputs stay in your browser&apos;s local storage.
           </li>
         </ul>
 

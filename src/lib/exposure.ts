@@ -1,4 +1,5 @@
 import type { EnvironmentalSnapshot, FamilyProfile } from '../types/airwise.ts';
+import { clampFiniteNumber } from './format.ts';
 
 export interface VentilationWindowPlan {
   suitability: 'Suitable' | 'Brief Only' | 'Mechanical Filtration Only' | 'Insufficient Data';
@@ -81,7 +82,8 @@ export function findOptimalVentilationWindow(
       avgAqi: snapshot.cpcbAqi,
       avgPm25: snapshot.pollutants.pm25,
       avgWindKmh: snapshot.weather.windSpeedKmh,
-      guidance: 'Check live AQI before opening exterior windows; favor mechanical HEPA filtration when outdoor haze is visible.',
+      guidance:
+        'Check live AQI before opening exterior windows; favor mechanical HEPA filtration when outdoor haze is visible.',
       limitation: 'No hourly particulate forecast points were returned by the telemetry feed.',
     };
   }
@@ -99,8 +101,7 @@ export function findOptimalVentilationWindow(
     const b = candidates[Math.min(i + 1, candidates.length - 1)];
     const avgPm25 = ((a.pm25 ?? 0) + (b.pm25 ?? 0)) / 2;
     const avgAqi = Math.round(((a.cpcbAqi ?? 0) + (b.cpcbAqi ?? 0)) / 2);
-    const avgWind =
-      Math.round((((a.windSpeedKmh ?? 6) + (b.windSpeedKmh ?? 6)) / 2) * 10) / 10;
+    const avgWind = Math.round((((a.windSpeedKmh ?? 6) + (b.windSpeedKmh ?? 6)) / 2) * 10) / 10;
 
     // Favor lowest PM2.5 slightly adjusted for stronger wind dispersion
     const score = avgPm25 - Math.min(8, avgWind * 0.4);
@@ -125,7 +126,8 @@ export function findOptimalVentilationWindow(
       avgPm25: bestAvgPm25,
       avgWindKmh: bestAvgWind,
       guidance: `Best natural cross-ventilation window is ${windowLabel} (projected CPCB AQI ~${bestAvgAqi}, wind ${bestAvgWind} km/h). Open opposite windows for 15–20 minutes to refresh indoor CO2.`,
-      limitation: 'Avoid street-facing windows if heavy local traffic passes outside your building during this window.',
+      limitation:
+        'Avoid street-facing windows if heavy local traffic passes outside your building during this window.',
     };
   }
 
@@ -137,7 +139,8 @@ export function findOptimalVentilationWindow(
       avgPm25: bestAvgPm25,
       avgWindKmh: bestAvgWind,
       guidance: `Cleanest upcoming window is ${windowLabel} (projected CPCB AQI ~${bestAvgAqi}). Limit natural ventilation to 5–10 minutes only if rooms feel stuffy, then run HEPA filtration.`,
-      limitation: 'Moderate outdoor particulates still raise indoor PM2.5 when windows stay open beyond brief air exchange.',
+      limitation:
+        'Moderate outdoor particulates still raise indoor PM2.5 when windows stay open beyond brief air exchange.',
     };
   }
 
@@ -148,7 +151,8 @@ export function findOptimalVentilationWindow(
     avgPm25: bestAvgPm25,
     avgWindKmh: bestAvgWind,
     guidance: `Even the cleanest upcoming window (${windowLabel}) remains elevated at CPCB AQI ~${bestAvgAqi}. Keep exterior windows latched and rely on closed-door HEPA filtration and range-hood exhaust.`,
-    limitation: 'Prolonged window sealing can elevate indoor CO2; use filtered fresh-air intake if available.',
+    limitation:
+      'Prolonged window sealing can elevate indoor CO2; use filtered fresh-air intake if available.',
   };
 }
 
@@ -238,9 +242,7 @@ export function simulateDailyExposureDose(
       ? Math.round(input.outdoorPm25 * 10) / 10
       : 60;
 
-  const outdoorHours = Number.isFinite(input.outdoorHoursPerDay)
-    ? Math.max(0, Math.min(12, Math.round(input.outdoorHoursPerDay * 2) / 2))
-    : 2;
+  const outdoorHours = clampFiniteNumber(Math.round(input.outdoorHoursPerDay * 2) / 2, 0, 12, 2);
   const indoorHours = 24 - outdoorHours;
 
   // Unmitigated baseline assumes natural open-window indoor infiltration (0.72 I/O ratio) and no mask
@@ -314,9 +316,7 @@ export function compareCitySnapshots(
       : null;
 
   const usAqiDelta =
-    primary.usAqi !== null && secondary.usAqi !== null
-      ? primary.usAqi - secondary.usAqi
-      : null;
+    primary.usAqi !== null && secondary.usAqi !== null ? primary.usAqi - secondary.usAqi : null;
 
   const pm25Ratio =
     primary.pollutants.pm25 !== null &&

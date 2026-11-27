@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Globe2 } from 'lucide-react';
 import type { CityLocation } from '../types/airwise.ts';
 import { PRESET_CITIES } from '../data/presets.ts';
@@ -20,20 +20,23 @@ export function AirQualityMap({
   cpcbCategory,
   onSelectLocation,
 }: AirQualityMapProps) {
-  const [regionMode, setRegionMode] = useState<MapRegionMode>(
-    currentLocation.isIndia ? 'INDIA' : 'WORLD'
-  );
+  const [modeOverride, setModeOverride] = useState<{
+    locationId: string;
+    mode: MapRegionMode;
+  } | null>(null);
 
-  // Sync map view automatically when user picks a city outside the current region view
-  useEffect(() => {
-    setRegionMode(currentLocation.isIndia ? 'INDIA' : 'WORLD');
-  }, [currentLocation.id, currentLocation.isIndia]);
+  const regionMode: MapRegionMode =
+    modeOverride?.locationId === currentLocation.id
+      ? modeOverride.mode
+      : currentLocation.isIndia
+        ? 'INDIA'
+        : 'WORLD';
 
-  const { getTabProps, getPanelProps } = useTabNavigation(
-    MAP_MODES,
-    regionMode,
-    setRegionMode
-  );
+  const setRegionMode = (nextMode: MapRegionMode) => {
+    setModeOverride({ locationId: currentLocation.id, mode: nextMode });
+  };
+
+  const { getTabProps, getPanelProps } = useTabNavigation(MAP_MODES, regionMode, setRegionMode);
 
   const projectedPins = useMemo(
     () => getMapStationsForMode(PRESET_CITIES, currentLocation, regionMode),
@@ -77,7 +80,9 @@ export function AirQualityMap({
                 {...tabProps}
                 onClick={() => setRegionMode(mode)}
                 className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
-                  active ? 'bg-white text-[#102A43] shadow-xs' : 'text-slate-700 hover:text-[#102A43]'
+                  active
+                    ? 'bg-white text-[#102A43] shadow-xs'
+                    : 'text-slate-700 hover:text-[#102A43]'
                 }`}
               >
                 {mode === 'INDIA' ? 'India Grid' : 'Global View'}
@@ -100,8 +105,24 @@ export function AirQualityMap({
         >
           {[20, 40, 60, 80].map((pos) => (
             <g key={pos}>
-              <line x1={pos} y1="0" x2={pos} y2="100" stroke="#CBD5E1" strokeWidth="0.25" strokeDasharray="1.5 1.5" />
-              <line x1="0" y1={pos} x2="100" y2={pos} stroke="#CBD5E1" strokeWidth="0.25" strokeDasharray="1.5 1.5" />
+              <line
+                x1={pos}
+                y1="0"
+                x2={pos}
+                y2="100"
+                stroke="#CBD5E1"
+                strokeWidth="0.25"
+                strokeDasharray="1.5 1.5"
+              />
+              <line
+                x1="0"
+                y1={pos}
+                x2="100"
+                y2={pos}
+                stroke="#CBD5E1"
+                strokeWidth="0.25"
+                strokeDasharray="1.5 1.5"
+              />
             </g>
           ))}
           {regionMode === 'INDIA' ? (
@@ -149,9 +170,7 @@ export function AirQualityMap({
                 <span
                   aria-hidden="true"
                   className={`h-2.5 w-2.5 shrink-0 rounded-full ring-2 ${
-                    isActive
-                      ? 'bg-[#20C997] ring-[#20C997]/30'
-                      : 'bg-[#38BDF8] ring-[#38BDF8]/25'
+                    isActive ? 'bg-[#20C997] ring-[#20C997]/30' : 'bg-[#38BDF8] ring-[#38BDF8]/25'
                   }`}
                 />
                 <span className="whitespace-nowrap">{station.name}</span>
@@ -166,7 +185,8 @@ export function AirQualityMap({
         })}
 
         <div className="pointer-events-none absolute bottom-2.5 left-3 rounded-md border border-slate-200/80 bg-white/95 px-2.5 py-1 text-[11px] font-mono text-slate-700 tabular-nums">
-          Active Station: {currentLocation.name} ({currentLocation.latitude.toFixed(2)}°, {currentLocation.longitude.toFixed(2)}°)
+          Active Station: {currentLocation.name} ({currentLocation.latitude.toFixed(2)}°,{' '}
+          {currentLocation.longitude.toFixed(2)}°)
         </div>
       </div>
 

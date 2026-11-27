@@ -33,7 +33,9 @@ export function SustainabilityPage({
     [adopted]
   );
   const sustainabilityScore =
-    alternatives.length > 0 ? Math.min(100, Math.round((adopted.length / alternatives.length) * 100)) : 0;
+    alternatives.length > 0
+      ? Math.min(100, Math.round((adopted.length / alternatives.length) * 100))
+      : 0;
 
   const visible = useMemo(
     () =>
@@ -61,7 +63,10 @@ export function SustainabilityPage({
       </div>
 
       {/* Header KPI Strip */}
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Sustainability Metrics">
+      <section
+        className="grid grid-cols-1 gap-4 sm:grid-cols-3"
+        aria-label="Sustainability Metrics"
+      >
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-xs font-semibold text-slate-600">Household Sustainability Score</p>
           <p className="mt-1 font-mono text-3xl font-bold text-[#102A43] tabular-nums">
@@ -94,7 +99,9 @@ export function SustainabilityPage({
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
           <p>
             <strong>Air Quality Context ({snapshot.location.name}):</strong> Current CPCB AQI is{' '}
-            <span className="font-mono">{snapshot.cpcbAqi}</span> ({snapshot.cpcbCategory}). When outdoor pollution is elevated, prioritize closed-cabin public transit or consolidated errands over prolonged unmasked outdoor cycling.
+            <span className="font-mono">{snapshot.cpcbAqi}</span> ({snapshot.cpcbCategory}). When
+            outdoor pollution is elevated, prioritize closed-cabin public transit or consolidated
+            errands over prolonged unmasked outdoor cycling.
           </p>
         </div>
       )}
@@ -112,7 +119,8 @@ export function SustainabilityPage({
             Practical Low-Emission Alternatives Across Daily Life
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-slate-600">
-            Every recommendation lists your baseline habit, suggested alternative, weekly CO2e reduction, transparent formula, assumptions, and confidence level.
+            Every recommendation lists your baseline habit, suggested alternative, weekly CO2e
+            reduction, transparent formula, assumptions, and confidence level.
           </p>
         </div>
       </section>
@@ -162,7 +170,9 @@ export function SustainabilityPage({
                   <span aria-hidden="true">·</span>
                   <span>Confidence: {alt.confidenceLevel}</span>
                 </div>
-                <h3 className="mt-1 font-display text-base font-bold text-[#102A43]">{alt.title}</h3>
+                <h3 className="mt-1 font-display text-base font-bold text-[#102A43]">
+                  {alt.title}
+                </h3>
               </div>
 
               <div className="flex items-center gap-3">

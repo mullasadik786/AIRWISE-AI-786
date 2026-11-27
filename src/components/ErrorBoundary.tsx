@@ -2,7 +2,7 @@ import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, RotateCcw } from 'lucide-react';
 
 interface ErrorBoundaryProps {
-  children: ReactNode;
+  children?: ReactNode;
   onReset?: () => void;
 }
 
@@ -18,7 +18,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   public componentDidCatch(error: Error, info: ErrorInfo) {
-    if (import.meta.env.DEV) {
+    if (import.meta.env?.DEV) {
       console.error('AIRWISE UI ErrorBoundary caught error:', error, info.componentStack);
     }
   }

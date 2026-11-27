@@ -1,9 +1,6 @@
 import { useMemo, useState } from 'react';
 import { RotateCcw, ShieldCheck } from 'lucide-react';
-import {
-  simulateDailyExposureDose,
-  type RespiratorGrade,
-} from '../lib/exposure.ts';
+import { simulateDailyExposureDose, type RespiratorGrade } from '../lib/exposure.ts';
 import { clampFiniteNumber, parseRespiratorGrade } from '../lib/format.ts';
 import { ProgressBar } from './ProgressBar.tsx';
 
@@ -106,18 +103,13 @@ export function ExposureSimulatorCard({
               step={0.5}
               value={outdoorHours}
               aria-valuetext={`${outdoorHours} outdoor hours per day`}
-              onChange={(e) =>
-                setOutdoorHours(clampFiniteNumber(Number(e.target.value), 0, 12, 2))
-              }
+              onChange={(e) => setOutdoorHours(clampFiniteNumber(Number(e.target.value), 0, 12, 2))}
               className="mt-1.5 w-full accent-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8]"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="sim-respirator"
-              className="block text-xs font-semibold text-[#102A43]"
-            >
+            <label htmlFor="sim-respirator" className="block text-xs font-semibold text-[#102A43]">
               Outdoor Respirator / Mask Selection
             </label>
             <select

@@ -165,7 +165,10 @@ export function AssistantPage({ snapshot, profile }: AssistantPageProps) {
       </section>
 
       {/* Quick Action Questions */}
-      <section className="rounded-xl border border-slate-200 bg-white p-5" aria-label="Quick Questions">
+      <section
+        className="rounded-xl border border-slate-200 bg-white p-5"
+        aria-label="Quick Questions"
+      >
         <h2 className="font-display text-sm font-bold text-[#102A43]">
           Common Family Air Quality Questions
         </h2>
@@ -193,7 +196,8 @@ export function AssistantPage({ snapshot, profile }: AssistantPageProps) {
               Ask about outdoor safety, indoor air, or daily habits
             </h3>
             <p className="mx-auto mt-1.5 max-w-lg text-sm text-slate-600">
-              Select any quick question above or type your own below. Every answer separates measured facts from estimates and explains what to do, why, when, and limitations.
+              Select any quick question above or type your own below. Every answer separates
+              measured facts from estimates and explains what to do, why, when, and limitations.
             </p>
           </div>
         ) : (

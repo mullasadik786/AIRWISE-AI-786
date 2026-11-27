@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Wind } from 'lucide-react';
 
 interface SafeImageProps {
@@ -25,11 +25,8 @@ export function SafeImage({
   fallbackTitle = 'AIRWISE Environmental View',
   priority = false,
 }: SafeImageProps) {
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    setFailed(false);
-  }, [src]);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const failed = failedSrc === src;
 
   if (failed || !isSafeImageSrc(src)) {
     return (
@@ -51,7 +48,7 @@ export function SafeImage({
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
       referrerPolicy="no-referrer"
-      onError={() => setFailed(true)}
+      onError={() => setFailedSrc(src)}
       className={className}
     />
   );

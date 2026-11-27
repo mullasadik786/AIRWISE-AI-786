@@ -51,10 +51,7 @@ export function DashboardPage({
 
       <DataStatusBanner snapshot={snapshot} loading={loading} onRefresh={onRefresh} />
 
-      <DashboardAqiSummary
-        snapshot={snapshot}
-        preferUs={profile.preferredStandard === 'US_EPA'}
-      />
+      <DashboardAqiSummary snapshot={snapshot} preferUs={profile.preferredStandard === 'US_EPA'} />
 
       {/* HD Regional Station Visual Strip */}
       <section className="grid grid-cols-1 items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-12">
@@ -66,12 +63,17 @@ export function DashboardPage({
           />
         </div>
         <div className="sm:col-span-8">
-          <p className="text-xs font-semibold text-emerald-700">Station Context · {snapshot.location.name}</p>
+          <p className="text-xs font-semibold text-emerald-700">
+            Station Context · {snapshot.location.name}
+          </p>
           <h2 className="mt-0.5 font-display text-sm font-bold text-[#102A43]">
             Six-Pollutant Telemetry & WHO 2021 Benchmark Ratios
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-slate-600">
-            Concentrations below are retrieved from atmospheric monitoring feeds for {snapshot.location.name} ({snapshot.location.latitude.toFixed(2)}°, {snapshot.location.longitude.toFixed(2)}°) and compared directly with WHO 2021 24-hour and 8-hour health benchmarks.
+            Concentrations below are retrieved from atmospheric monitoring feeds for{' '}
+            {snapshot.location.name} ({snapshot.location.latitude.toFixed(2)}°,{' '}
+            {snapshot.location.longitude.toFixed(2)}°) and compared directly with WHO 2021 24-hour
+            and 8-hour health benchmarks.
           </p>
         </div>
       </section>
@@ -79,7 +81,10 @@ export function DashboardPage({
       <PollutantGrid pollutants={snapshot.pollutants} whoRatios={snapshot.whoRatios} />
 
       {/* Household Readiness KPI Strip */}
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Household Action Metrics">
+      <section
+        className="grid grid-cols-1 gap-4 sm:grid-cols-3"
+        aria-label="Household Action Metrics"
+      >
         <button
           type="button"
           onClick={() => onNavigate('indoor')}
@@ -113,7 +118,9 @@ export function DashboardPage({
           <p className="mt-1 font-mono text-2xl font-bold text-emerald-700 tabular-nums">
             {weeklyCo2SavedKg.toFixed(1)} kg CO2e
           </p>
-          <p className="mt-1 text-xs text-slate-600">Open calculator for annual & community impact</p>
+          <p className="mt-1 text-xs text-slate-600">
+            Open calculator for annual & community impact
+          </p>
         </button>
       </section>
 

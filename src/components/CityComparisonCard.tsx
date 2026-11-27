@@ -19,16 +19,11 @@ export function CityComparisonCard({ primarySnapshot }: CityComparisonCardProps)
     [primarySnapshot.location.id]
   );
 
-  const defaultCityId = candidateCities.find((c) => c.id === 'bengaluru-in')?.id ?? candidateCities[0]?.id ?? '';
+  const defaultCityId =
+    candidateCities.find((c) => c.id === 'bengaluru-in')?.id ?? candidateCities[0]?.id ?? '';
   const [targetCityId, setTargetCityId] = useState(defaultCityId);
   const [secondarySnapshot, setSecondarySnapshot] = useState<EnvironmentalSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!candidateCities.some((c) => c.id === targetCityId) && candidateCities[0]) {
-      setTargetCityId(candidateCities[0].id);
-    }
-  }, [candidateCities, targetCityId]);
 
   const targetCity = useMemo(
     () => candidateCities.find((c) => c.id === targetCityId) ?? candidateCities[0],
@@ -76,7 +71,10 @@ export function CityComparisonCard({ primarySnapshot }: CityComparisonCardProps)
     [primarySnapshot, secondarySnapshot]
   );
 
-  const primaryVent = useMemo(() => findOptimalVentilationWindow(primarySnapshot), [primarySnapshot]);
+  const primaryVent = useMemo(
+    () => findOptimalVentilationWindow(primarySnapshot),
+    [primarySnapshot]
+  );
   const secondaryVent = useMemo(
     () => (secondarySnapshot ? findOptimalVentilationWindow(secondarySnapshot) : null),
     [secondarySnapshot]
@@ -134,23 +132,30 @@ export function CityComparisonCard({ primarySnapshot }: CityComparisonCardProps)
           <div className="overflow-x-auto rounded-lg border border-slate-200">
             <table className="w-full text-left text-xs">
               <caption className="sr-only">
-                Side-by-side atmospheric comparison between {primarySnapshot.location.name} and {secondarySnapshot.location.name}
+                Side-by-side atmospheric comparison between {primarySnapshot.location.name} and{' '}
+                {secondarySnapshot.location.name}
               </caption>
               <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
                 <tr>
-                  <th scope="col" className="px-3 py-2 font-semibold">Metric</th>
+                  <th scope="col" className="px-3 py-2 font-semibold">
+                    Metric
+                  </th>
                   <th scope="col" className="px-3 py-2 text-right font-semibold">
                     {primarySnapshot.location.name}
                   </th>
                   <th scope="col" className="px-3 py-2 text-right font-semibold">
                     {secondarySnapshot.location.name}
                   </th>
-                  <th scope="col" className="px-3 py-2 text-right font-semibold">Difference</th>
+                  <th scope="col" className="px-3 py-2 text-right font-semibold">
+                    Difference
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 <tr>
-                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">Indian CPCB AQI</th>
+                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">
+                    Indian CPCB AQI
+                  </th>
                   <td className="px-3 py-2 text-right font-mono font-semibold tabular-nums">
                     {primarySnapshot.cpcbAqi ?? '—'} ({primarySnapshot.cpcbCategory})
                   </td>
@@ -164,7 +169,9 @@ export function CityComparisonCard({ primarySnapshot }: CityComparisonCardProps)
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">US EPA AQI</th>
+                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">
+                    US EPA AQI
+                  </th>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
                     {primarySnapshot.usAqi ?? '—'}
                   </td>
@@ -178,7 +185,9 @@ export function CityComparisonCard({ primarySnapshot }: CityComparisonCardProps)
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">PM2.5 (µg/m³)</th>
+                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">
+                    PM2.5 (µg/m³)
+                  </th>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
                     {primarySnapshot.pollutants.pm25 ?? '—'}
                   </td>
@@ -190,7 +199,9 @@ export function CityComparisonCard({ primarySnapshot }: CityComparisonCardProps)
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">Wind Dispersion (km/h)</th>
+                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">
+                    Wind Dispersion (km/h)
+                  </th>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
                     {primarySnapshot.weather.windSpeedKmh ?? '—'}
                   </td>
@@ -204,7 +215,9 @@ export function CityComparisonCard({ primarySnapshot }: CityComparisonCardProps)
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">Best Ventilation Window</th>
+                  <th scope="row" className="px-3 py-2 font-medium text-[#102A43]">
+                    Best Ventilation Window
+                  </th>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
                     {primaryVent.suitability}
                   </td>

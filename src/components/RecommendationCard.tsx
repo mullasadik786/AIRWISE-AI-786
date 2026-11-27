@@ -42,9 +42,7 @@ export function RecommendationDetailsGrid({
       </div>
       <div>
         <dt className="text-xs font-semibold text-slate-600">Confidence & Limitations</dt>
-        <dd className="mt-0.5 text-sm text-slate-600">
-          {recommendation.confidenceAndLimitations}
-        </dd>
+        <dd className="mt-0.5 text-sm text-slate-600">{recommendation.confidenceAndLimitations}</dd>
       </div>
     </dl>
   );

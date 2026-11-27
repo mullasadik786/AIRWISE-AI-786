@@ -32,8 +32,7 @@ test('fetchAirQualitySnapshot returns server snapshot, handles incomplete payloa
     assert.equal(fallbackSnap.dataStatus, 'DEMO_FALLBACK');
     assert.equal(fallbackSnap.statusMessage, 'Custom incomplete reason');
 
-    globalThis.fetch = (async () =>
-      new Response('Bad Gateway', { status: 502 })) as typeof fetch;
+    globalThis.fetch = (async () => new Response('Bad Gateway', { status: 502 })) as typeof fetch;
 
     await assert.rejects(() => fetchAirQualitySnapshot(delhi), /HTTP 502/);
   } finally {

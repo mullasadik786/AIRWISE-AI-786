@@ -1,18 +1,15 @@
 import { z } from 'zod';
+import { stripControlCharacters } from './format.ts';
 
 /**
  * Strips ASCII control characters and normalizes internal whitespace.
  */
 export function stripControlChars(value: string): string {
-  return value.replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim();
+  return stripControlCharacters(value, ' ').replace(/\s+/g, ' ').trim();
 }
 
 const optionalSanitizedString = (maxLen: number) =>
-  z
-    .string()
-    .transform(stripControlChars)
-    .pipe(z.string().max(maxLen))
-    .optional();
+  z.string().transform(stripControlChars).pipe(z.string().max(maxLen)).optional();
 
 export const LocationSearchQuerySchema = z.object({
   q: z
@@ -30,11 +27,7 @@ export const LocationSearchQuerySchema = z.object({
 export const AirQualityQuerySchema = z.object({
   lat: z.coerce.number().finite().min(-90).max(90),
   lon: z.coerce.number().finite().min(-180).max(180),
-  name: z
-    .string()
-    .transform(stripControlChars)
-    .pipe(z.string().min(1).max(100))
-    .optional(),
+  name: z.string().transform(stripControlChars).pipe(z.string().min(1).max(100)).optional(),
   region: optionalSanitizedString(100),
   country: optionalSanitizedString(80),
   countryCode: optionalSanitizedString(10),
@@ -98,7 +91,10 @@ export const PersistedStateSchema = z.object({
   customLocation: CityLocationSchema.optional(),
   profile: FamilyProfileSchema.optional(),
   completedTaskIds: z.array(z.string().max(60)).max(50).optional(),
-  completedRoutinePeriods: z.array(z.enum(['Morning', 'Afternoon', 'Evening', 'Night'])).max(4).optional(),
+  completedRoutinePeriods: z
+    .array(z.enum(['Morning', 'Afternoon', 'Evening', 'Night']))
+    .max(4)
+    .optional(),
   adoptedHabitIds: z.array(z.string().max(60)).max(50).optional(),
   joinedChallengeIds: z.array(z.string().max(60)).max(50).optional(),
   readAlertIds: z.array(z.string().max(60)).max(50).optional(),
@@ -158,11 +154,7 @@ const INJECTION_PATTERNS = [
  * Strips invisible/bidi characters and evaluates prompts against known injection patterns.
  */
 export function sanitizeUserPrompt(raw: string): { sanitized: string; flagged: boolean } {
-  const cleaned = raw
-    // Strip ASCII control characters and invisible/bidi unicode characters
-    .replace(/[\u0000-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const cleaned = stripControlCharacters(raw, ' ', true).replace(/\s+/g, ' ').trim();
   const flagged = INJECTION_PATTERNS.some((pattern) => pattern.test(cleaned));
   return { sanitized: cleaned, flagged };
 }

@@ -150,3 +150,30 @@ test('generateAssistantAdvice parses valid Gemini JSON, retries transient errors
   assert.equal(moderateFallback.source, 'rule-engine-fallback');
   assert.ok(moderateFallback.recommendation.what.toLowerCase().includes('moderate'));
 });
+
+test('generateAssistantAdvice falls back cleanly on schema-invalid output and request timeouts', async () => {
+  const schemaInvalidClient: GeminiClientLike = {
+    models: {
+      generateContent: async () => ({
+        text: JSON.stringify({
+          summary: 'Only summary provided without required recommendation or actionSteps',
+        }),
+      }),
+    },
+  };
+  const schemaFallback = await generateAssistantAdvice(SAMPLE_PAYLOAD, schemaInvalidClient);
+  assert.equal(schemaFallback.source, 'rule-engine-fallback');
+  assert.ok(schemaFallback.actionSteps.length >= 2);
+
+  const timeoutClient: GeminiClientLike = {
+    models: {
+      generateContent: () =>
+        new Promise<{ text?: string }>(() => {
+          // Intentionally never settles to verify timeout guard
+        }),
+    },
+  };
+  const timeoutFallback = await generateAssistantAdvice(SAMPLE_PAYLOAD, timeoutClient, 25);
+  assert.equal(timeoutFallback.source, 'rule-engine-fallback');
+  assert.ok(timeoutFallback.summary.includes(SAMPLE_PAYLOAD.locationName));
+});

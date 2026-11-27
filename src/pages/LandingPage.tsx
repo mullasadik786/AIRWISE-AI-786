@@ -79,6 +79,51 @@ const FIVE_QUESTIONS: readonly CapabilityQuestion[] = [
   },
 ];
 
+interface WorkflowStep {
+  step: string;
+  title: string;
+  description: string;
+}
+
+const HOW_IT_WORKS_STEPS: readonly WorkflowStep[] = [
+  {
+    step: 'Step 01',
+    title: 'Fetch verified atmospheric & weather feeds',
+    description:
+      'Server-side requests pull hourly pollutant concentrations and wind/humidity data for your chosen city or coordinates after permission.',
+  },
+  {
+    step: 'Step 02',
+    title: 'Contextualize for your household profile',
+    description:
+      'Without collecting personal medical records, recommendations adjust for children, older adults, daily commuters, or indoor workers.',
+  },
+  {
+    step: 'Step 03',
+    title: 'Turn readings into low-exposure, low-carbon habits',
+    description:
+      'Review morning-to-night schedules, safe ventilation windows, and measurable CO2e reductions in one unified workspace.',
+  },
+];
+
+const TRUST_PILLARS: ReadonlyArray<{ title: string; description: string }> = [
+  {
+    title: 'No Invented Measurements',
+    description:
+      'Live air quality and weather arrive via server-side API calls. If a provider is unreachable, AIRWISE AI explicitly marks the view as DEMO DATA or DATA UNAVAILABLE.',
+  },
+  {
+    title: 'Clear Standard Distinctions',
+    description:
+      'Indian CPCB NAQI categories, US EPA AQI breakpoints, and WHO 2021 health guidelines are presented side by side so families never confuse scales.',
+  },
+  {
+    title: 'Privacy-First Architecture',
+    description:
+      'Location detection runs only after explicit permission. Household preferences stay in local browser storage with one-click deletion in Settings & Privacy.',
+  },
+];
+
 export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
   const isLive = snapshot.dataStatus === 'LIVE' || snapshot.dataStatus === 'CACHED';
 
@@ -96,17 +141,32 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-8 px-4 sm:px-6">
           <Logo onClick={() => onNavigate('landing')} />
 
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700" aria-label="Primary">
-            <a href="#live-air" className="hover:text-[#102A43] hover:underline underline-offset-4 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded">
+          <nav
+            className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700"
+            aria-label="Primary"
+          >
+            <a
+              href="#live-air"
+              className="hover:text-[#102A43] hover:underline underline-offset-4 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded"
+            >
               Live Air
             </a>
-            <a href="#family-shield" className="hover:text-[#102A43] hover:underline underline-offset-4 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded">
+            <a
+              href="#family-shield"
+              className="hover:text-[#102A43] hover:underline underline-offset-4 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded"
+            >
               Family Shield
             </a>
-            <a href="#impact" className="hover:text-[#102A43] hover:underline underline-offset-4 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded">
+            <a
+              href="#impact"
+              className="hover:text-[#102A43] hover:underline underline-offset-4 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded"
+            >
               Impact
             </a>
-            <a href="#community" className="hover:text-[#102A43] hover:underline underline-offset-4 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded">
+            <a
+              href="#community"
+              className="hover:text-[#102A43] hover:underline underline-offset-4 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded"
+            >
               Community
             </a>
           </nav>
@@ -135,7 +195,8 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
                 Breathe Better. Live Smarter.
               </h1>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
-                Your intelligent companion for cleaner air, healthier homes, and sustainable everyday living.
+                Your intelligent companion for cleaner air, healthier homes, and sustainable
+                everyday living.
               </p>
 
               <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -177,7 +238,9 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
                     <div>
                       <span className="block text-slate-600">PM2.5</span>
                       <span className="font-mono text-sm font-semibold text-[#102A43] tabular-nums">
-                        {snapshot.pollutants.pm25 !== null ? `${snapshot.pollutants.pm25} µg/m³` : 'N/A'}
+                        {snapshot.pollutants.pm25 !== null
+                          ? `${snapshot.pollutants.pm25} µg/m³`
+                          : 'N/A'}
                       </span>
                     </div>
                     <div>
@@ -189,7 +252,9 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
                     <div>
                       <span className="block text-slate-600">Wind</span>
                       <span className="font-mono text-sm font-semibold text-[#102A43] tabular-nums">
-                        {snapshot.weather.windSpeedKmh !== null ? `${snapshot.weather.windSpeedKmh} km/h` : 'N/A'}
+                        {snapshot.weather.windSpeedKmh !== null
+                          ? `${snapshot.weather.windSpeedKmh} km/h`
+                          : 'N/A'}
                       </span>
                     </div>
                   </div>
@@ -217,7 +282,8 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
               Five practical questions answered with scientific clarity
             </h2>
             <p className="mt-2 text-sm text-slate-600 sm:text-base">
-              Every insight separates measured atmospheric data from estimates and explains what to do, why it matters, when to act, and its limitations.
+              Every insight separates measured atmospheric data from estimates and explains what to
+              do, why it matters, when to act, and its limitations.
             </p>
           </div>
 
@@ -251,33 +317,15 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 className="font-display text-2xl font-bold text-[#102A43]">How AIRWISE AI works</h2>
             <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3">
-              <div>
-                <p className="font-mono text-xs font-semibold text-slate-600">Step 01</p>
-                <h3 className="mt-1 font-display text-base font-bold text-[#102A43]">
-                  Fetch verified atmospheric & weather feeds
-                </h3>
-                <p className="mt-2 text-sm text-slate-600">
-                  Server-side requests pull hourly pollutant concentrations and wind/humidity data for your chosen city or coordinates after permission.
-                </p>
-              </div>
-              <div>
-                <p className="font-mono text-xs font-semibold text-slate-600">Step 02</p>
-                <h3 className="mt-1 font-display text-base font-bold text-[#102A43]">
-                  Contextualize for your household profile
-                </h3>
-                <p className="mt-2 text-sm text-slate-600">
-                  Without collecting personal medical records, recommendations adjust for children, older adults, daily commuters, or indoor workers.
-                </p>
-              </div>
-              <div>
-                <p className="font-mono text-xs font-semibold text-slate-600">Step 03</p>
-                <h3 className="mt-1 font-display text-base font-bold text-[#102A43]">
-                  Turn readings into low-exposure, low-carbon habits
-                </h3>
-                <p className="mt-2 text-sm text-slate-600">
-                  Review morning-to-night schedules, safe ventilation windows, and measurable CO2e reductions in one unified workspace.
-                </p>
-              </div>
+              {HOW_IT_WORKS_STEPS.map((item) => (
+                <div key={item.step}>
+                  <p className="font-mono text-xs font-semibold text-slate-600">{item.step}</p>
+                  <h3 className="mt-1 font-display text-base font-bold text-[#102A43]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-600">{item.description}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -303,15 +351,24 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
                 Built for severe winter smog and everyday indoor living
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                When outdoor AQI crosses into Poor, Very Poor, or Severe territory, families spend up to 90% of their time indoors. AIRWISE AI guides safe cross-ventilation timing, bedroom clean-air zones, kitchen range hood venting, and damp dust removal—while transparently explaining filter limitations.
+                When outdoor AQI crosses into Poor, Very Poor, or Severe territory, families spend
+                up to 90% of their time indoors. AIRWISE AI guides safe cross-ventilation timing,
+                bedroom clean-air zones, kitchen range hood venting, and damp dust removal—while
+                transparently explaining filter limitations.
               </p>
               <div className="mt-5 grid grid-cols-1 gap-3 text-sm text-slate-700 sm:grid-cols-2">
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                  <CheckCircle2
+                    className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700"
+                    aria-hidden="true"
+                  />
                   <span>Room-by-room checklist across 5 home spaces</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                  <CheckCircle2
+                    className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700"
+                    aria-hidden="true"
+                  />
                   <span>Dynamic ventilation & smog alerts</span>
                 </div>
               </div>
@@ -341,16 +398,22 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
                 Quantify emissions saved with transparent methodology
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                Use documented emission factors to calculate daily, monthly, and annual CO2e reductions from shifting car trips to metro/bus, carpooling, cutting standby electricity, and avoiding open waste burning.
+                Use documented emission factors to calculate daily, monthly, and annual CO2e
+                reductions from shifting car trips to metro/bus, carpooling, cutting standby
+                electricity, and avoiding open waste burning.
               </p>
 
-              <div id="community" className="mt-6 rounded-xl border border-slate-200 bg-[#F4F8FB] p-5">
+              <div
+                id="community"
+                className="mt-6 rounded-xl border border-slate-200 bg-[#F4F8FB] p-5"
+              >
                 <div className="flex items-center gap-2 text-sm font-bold text-[#102A43]">
                   <Users className="h-4 w-4 text-emerald-700" aria-hidden="true" />
                   <span>Community Air Quality Hub</span>
                 </div>
                 <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
-                  Join weekly neighborhood challenges, estimate collective 100-home impact, and generate privacy-safe awareness cards without exposing personal location data.
+                  Join weekly neighborhood challenges, estimate collective 100-home impact, and
+                  generate privacy-safe awareness cards without exposing personal location data.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <button
@@ -391,24 +454,12 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
               <span>Trust, Scientific Integrity & Privacy</span>
             </div>
             <div className="mt-4 grid grid-cols-1 gap-6 text-sm text-slate-600 md:grid-cols-3">
-              <div>
-                <h3 className="font-semibold text-[#102A43]">No Invented Measurements</h3>
-                <p className="mt-1 text-xs leading-relaxed">
-                  Live air quality and weather arrive via server-side API calls. If a provider is unreachable, AIRWISE AI explicitly marks the view as DEMO DATA or DATA UNAVAILABLE.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#102A43]">Clear Standard Distinctions</h3>
-                <p className="mt-1 text-xs leading-relaxed">
-                  Indian CPCB NAQI categories, US EPA AQI breakpoints, and WHO 2021 health guidelines are presented side by side so families never confuse scales.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#102A43]">Privacy-First Architecture</h3>
-                <p className="mt-1 text-xs leading-relaxed">
-                  Location detection runs only after explicit permission. Household preferences stay in local browser storage with one-click deletion in Settings & Privacy.
-                </p>
-              </div>
+              {TRUST_PILLARS.map((pillar) => (
+                <div key={pillar.title}>
+                  <h3 className="font-semibold text-[#102A43]">{pillar.title}</h3>
+                  <p className="mt-1 text-xs leading-relaxed">{pillar.description}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -420,20 +471,37 @@ export function LandingPage({ snapshot, onNavigate }: LandingPageProps) {
           <div>
             <p className="font-semibold text-[#102A43]">AIRWISE AI · Urban Air Quality Assistant</p>
             <p className="mt-1">
-              Environmental decision support only. Not a substitute for medical diagnosis or emergency civic advisories.
+              Environmental decision support only. Not a substitute for medical diagnosis or
+              emergency civic advisories.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-4">
-            <button type="button" onClick={() => onNavigate('dashboard')} className="hover:text-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded px-1">
+            <button
+              type="button"
+              onClick={() => onNavigate('dashboard')}
+              className="hover:text-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded px-1"
+            >
               Dashboard
             </button>
-            <button type="button" onClick={() => onNavigate('assistant')} className="hover:text-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded px-1">
+            <button
+              type="button"
+              onClick={() => onNavigate('assistant')}
+              className="hover:text-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded px-1"
+            >
               AI Assistant
             </button>
-            <button type="button" onClick={() => onNavigate('insights')} className="hover:text-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded px-1">
+            <button
+              type="button"
+              onClick={() => onNavigate('insights')}
+              className="hover:text-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded px-1"
+            >
               Insights
             </button>
-            <button type="button" onClick={() => onNavigate('settings')} className="hover:text-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded px-1">
+            <button
+              type="button"
+              onClick={() => onNavigate('settings')}
+              className="hover:text-[#102A43] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded px-1"
+            >
               Settings & Privacy
             </button>
           </div>

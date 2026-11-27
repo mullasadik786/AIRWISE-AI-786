@@ -8,7 +8,11 @@ interface AqiStatusBadgeProps {
   standardLabel?: string;
 }
 
-export function AqiStatusBadge({ category, aqi, standardLabel = 'CPCB NAQI' }: AqiStatusBadgeProps) {
+export function AqiStatusBadge({
+  category,
+  aqi,
+  standardLabel = 'CPCB NAQI',
+}: AqiStatusBadgeProps) {
   const meta = getCpcbCategoryMeta(category);
 
   const Icon =
@@ -30,7 +34,9 @@ export function AqiStatusBadge({ category, aqi, standardLabel = 'CPCB NAQI' }: A
     >
       <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
       <span className="font-semibold whitespace-nowrap">{category}</span>
-      <span aria-hidden="true" className="opacity-50">·</span>
+      <span aria-hidden="true" className="opacity-50">
+        ·
+      </span>
       <span className="font-mono text-xs tabular-nums whitespace-nowrap">
         {aqi !== null ? `${aqi} (${meta.rangeLabel})` : 'N/A'}
       </span>

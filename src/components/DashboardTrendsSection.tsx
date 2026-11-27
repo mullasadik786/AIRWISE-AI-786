@@ -46,7 +46,16 @@ export function DashboardTrendsSection({
 
   function handleExportCsv() {
     const csv = buildCsvString(
-      ['Timestamp', 'Label', 'Phase', 'PM2.5 (ug/m3)', 'PM10 (ug/m3)', 'CPCB AQI', 'US AQI', 'Wind (km/h)'],
+      [
+        'Timestamp',
+        'Label',
+        'Phase',
+        'PM2.5 (ug/m3)',
+        'PM10 (ug/m3)',
+        'CPCB AQI',
+        'US AQI',
+        'Wind (km/h)',
+      ],
       snapshot.hourly.map((h) => [
         h.time,
         h.label,
@@ -66,7 +75,10 @@ export function DashboardTrendsSection({
   }
 
   return (
-    <section className="grid grid-cols-1 gap-5 lg:grid-cols-12" aria-label="Pollution Trends and Distribution">
+    <section
+      className="grid grid-cols-1 gap-5 lg:grid-cols-12"
+      aria-label="Pollution Trends and Distribution"
+    >
       <div className="rounded-xl border border-slate-200 bg-white p-5 lg:col-span-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
@@ -100,9 +112,14 @@ export function DashboardTrendsSection({
 
         <figure className="mt-4">
           <figcaption className="sr-only">
-            48-hour hourly area chart of PM2.5 and PM10 particulate concentrations in {snapshot.location.name}. Toggle Accessible Table for numeric values.
+            48-hour hourly area chart of PM2.5 and PM10 particulate concentrations in{' '}
+            {snapshot.location.name}. Toggle Accessible Table for numeric values.
           </figcaption>
-          <div className="h-64 w-full" role="img" aria-label={`48-hour PM2.5 and PM10 chart for ${snapshot.location.name}`}>
+          <div
+            className="h-64 w-full"
+            role="img"
+            aria-label={`48-hour PM2.5 and PM10 chart for ${snapshot.location.name}`}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
@@ -169,17 +186,25 @@ export function DashboardTrendsSection({
         {showDistTable ? (
           <div className="mt-4 overflow-x-auto rounded-lg border border-slate-200">
             <table className="w-full text-left text-xs">
-              <caption className="sr-only">Hours spent in each CPCB AQI category over 48 hours</caption>
+              <caption className="sr-only">
+                Hours spent in each CPCB AQI category over 48 hours
+              </caption>
               <thead className="bg-slate-50 text-slate-700">
                 <tr>
-                  <th scope="col" className="px-3 py-2 font-semibold">Category</th>
-                  <th scope="col" className="px-3 py-2 text-right font-semibold">Hours</th>
+                  <th scope="col" className="px-3 py-2 font-semibold">
+                    Category
+                  </th>
+                  <th scope="col" className="px-3 py-2 text-right font-semibold">
+                    Hours
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-mono tabular-nums">
                 {categoryDistribution.map((row) => (
                   <tr key={row.category}>
-                    <th scope="row" className="px-3 py-1.5 font-sans font-medium text-[#102A43]">{row.category}</th>
+                    <th scope="row" className="px-3 py-1.5 font-sans font-medium text-[#102A43]">
+                      {row.category}
+                    </th>
                     <td className="px-3 py-1.5 text-right">{row.hours}</td>
                   </tr>
                 ))}
@@ -189,14 +214,28 @@ export function DashboardTrendsSection({
         ) : (
           <figure className="mt-4">
             <figcaption className="sr-only">
-              Bar chart showing total hours spent in each Indian CPCB AQI category across the 48-hour window.
+              Bar chart showing total hours spent in each Indian CPCB AQI category across the
+              48-hour window.
             </figcaption>
-            <div className="h-48 w-full" role="img" aria-label="48-hour CPCB category distribution bar chart">
+            <div
+              className="h-48 w-full"
+              role="img"
+              aria-label="48-hour CPCB category distribution bar chart"
+            >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={categoryDistribution} layout="vertical" margin={{ left: 10, right: 12 }}>
+                <BarChart
+                  data={categoryDistribution}
+                  layout="vertical"
+                  margin={{ left: 10, right: 12 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                   <XAxis type="number" tick={{ fontSize: 11, fill: '#475569' }} />
-                  <YAxis type="category" dataKey="category" tick={{ fontSize: 11, fill: '#102A43' }} width={86} />
+                  <YAxis
+                    type="category"
+                    dataKey="category"
+                    tick={{ fontSize: 11, fill: '#102A43' }}
+                    width={86}
+                  />
                   <Tooltip />
                   <Bar dataKey="hours" name="Hours" radius={[0, 4, 4, 0]}>
                     {categoryDistribution.map((entry) => (

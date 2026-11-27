@@ -159,7 +159,10 @@ export function setBoundedCacheEntry<T extends { expiresAt: number }>(
   cache.set(key, entry);
 }
 
-function calculateParticulateCpcbAqi(pm25: number | null, pm10: number | null) {
+function calculateParticulateCpcbAqi(
+  pm25: number | null,
+  pm10: number | null
+): ReturnType<typeof calculateCpcbAqi> {
   return calculateCpcbAqi({
     pm25,
     pm10,
@@ -171,7 +174,9 @@ function calculateParticulateCpcbAqi(pm25: number | null, pm10: number | null) {
 }
 
 function asStringArray(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : [];
 }
 
 function asNullableNumberArray(value: unknown): Array<number | null> {
@@ -264,8 +269,10 @@ export function parseGeocodingEntry(raw: unknown): CityLocation | null {
     return null;
   }
 
-  const admin1 = typeof raw.admin1 === 'string' && raw.admin1.trim() ? raw.admin1.trim() : undefined;
-  const country = typeof raw.country === 'string' && raw.country.trim() ? raw.country.trim() : 'Unknown';
+  const admin1 =
+    typeof raw.admin1 === 'string' && raw.admin1.trim() ? raw.admin1.trim() : undefined;
+  const country =
+    typeof raw.country === 'string' && raw.country.trim() ? raw.country.trim() : 'Unknown';
   const countryCode =
     typeof raw.country_code === 'string' && raw.country_code.trim()
       ? raw.country_code.trim().toUpperCase()
@@ -315,7 +322,9 @@ function buildHourlySeries(
     const tempC =
       wxIdx !== undefined ? sanitizeMeasurement(wxJson?.hourly?.temperature_2m?.[wxIdx], 65) : null;
     const windKmh =
-      wxIdx !== undefined ? sanitizeMeasurement(wxJson?.hourly?.wind_speed_10m?.[wxIdx], 250) : null;
+      wxIdx !== undefined
+        ? sanitizeMeasurement(wxJson?.hourly?.wind_speed_10m?.[wxIdx], 250)
+        : null;
 
     hourly.push({
       time: t,
@@ -359,7 +368,9 @@ function buildDailyForecast(
     .map((date, idx) => {
       const vals = dailyMap.get(date) ?? [];
       const avgPm25 =
-        vals.length > 0 ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : null;
+        vals.length > 0
+          ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10
+          : null;
       const maxPm25 = vals.length > 0 ? Math.max(...vals) : null;
       const dCpcb = calculateParticulateCpcbAqi(avgPm25, null);
       const wxDailyIdx = wxJson?.daily?.time?.indexOf(date) ?? -1;
@@ -371,9 +382,13 @@ function buildDailyForecast(
         cpcbAqi: dCpcb.aqi,
         category: getCpcbCategory(dCpcb.aqi),
         tempMinC:
-          wxDailyIdx >= 0 ? sanitizeMeasurement(wxJson?.daily?.temperature_2m_min?.[wxDailyIdx], 65) : null,
+          wxDailyIdx >= 0
+            ? sanitizeMeasurement(wxJson?.daily?.temperature_2m_min?.[wxDailyIdx], 65)
+            : null,
         tempMaxC:
-          wxDailyIdx >= 0 ? sanitizeMeasurement(wxJson?.daily?.temperature_2m_max?.[wxDailyIdx], 65) : null,
+          wxDailyIdx >= 0
+            ? sanitizeMeasurement(wxJson?.daily?.temperature_2m_max?.[wxDailyIdx], 65)
+            : null,
       };
     });
 }

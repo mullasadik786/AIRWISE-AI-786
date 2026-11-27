@@ -104,9 +104,20 @@ test('simulateDailyExposureDose models dose reductions with N95 + HEPA + sealed 
   assert.equal(baselineCase.outdoorPm25Used, 60);
   assert.equal(baselineCase.reductionPercent, 0);
   assert.equal(baselineCase.protectionTier, 'Baseline Vulnerability');
+
+  const surgicalZeroCase = simulateDailyExposureDose({
+    outdoorPm25: 0,
+    outdoorHoursPerDay: 3,
+    respirator: 'surgical',
+    indoorHepaActive: true,
+    windowsSealed: false,
+  });
+  assert.equal(surgicalZeroCase.outdoorPm25Used, 0);
+  assert.equal(surgicalZeroCase.reductionPercent, 0);
+  assert.equal(surgicalZeroCase.unmitigatedDailyDoseUg, 0);
 });
 
-test('compareCitySnapshots calculates deltas and cleaner city summary accurately', () => {
+test('compareCitySnapshots calculates deltas, equal AQI, null pollutants, and cleaner city summary accurately', () => {
   const delhi = buildDemoFallbackSnapshot(PRESET_CITIES.find((c) => c.id === 'delhi-in')!);
   const tokyo = buildDemoFallbackSnapshot(PRESET_CITIES.find((c) => c.id === 'tokyo-jp')!);
 
@@ -115,4 +126,18 @@ test('compareCitySnapshots calculates deltas and cleaner city summary accurately
   assert.ok(cmp.cpcbDelta !== null && cmp.cpcbDelta > 0);
   assert.ok(cmp.pm25Ratio !== null && cmp.pm25Ratio > 1);
   assert.ok(cmp.summaryText.includes(tokyo.location.name));
+
+  const reverseCmp = compareCitySnapshots(tokyo, delhi);
+  assert.equal(reverseCmp.cleanerCityName, tokyo.location.name);
+  assert.ok(reverseCmp.cpcbDelta !== null && reverseCmp.cpcbDelta < 0);
+
+  const equalCmp = compareCitySnapshots(tokyo, {
+    ...delhi,
+    cpcbAqi: tokyo.cpcbAqi,
+    pollutants: { ...delhi.pollutants, pm25: null },
+  });
+  assert.equal(equalCmp.cleanerCityName, null);
+  assert.equal(equalCmp.cpcbDelta, 0);
+  assert.equal(equalCmp.pm25Ratio, null);
+  assert.ok(equalCmp.summaryText.includes('share the same CPCB AQI'));
 });

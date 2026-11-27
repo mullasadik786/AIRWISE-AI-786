@@ -44,11 +44,7 @@ export function CommunityPage({
   const { isCopied, copyText } = useClipboardCopy();
   const copied = isCopied('card');
 
-  const challengeTabs = useTabNavigation(
-    CHALLENGE_FILTERS,
-    challengeFilter,
-    setChallengeFilter
-  );
+  const challengeTabs = useTabNavigation(CHALLENGE_FILTERS, challengeFilter, setChallengeFilter);
   const cardTabs = useTabNavigation(CARD_THEMES, cardTheme, setCardTheme);
 
   const collectiveWeeklyKg = useMemo(
@@ -69,11 +65,7 @@ export function CommunityPage({
   );
 
   const maxWeeklyKg = useMemo(
-    () =>
-      COMMUNITY_CHALLENGES.reduce(
-        (sum, c) => sum + c.estimatedWeeklyCo2SavedKgPerHome,
-        0
-      ),
+    () => COMMUNITY_CHALLENGES.reduce((sum, c) => sum + c.estimatedWeeklyCo2SavedKgPerHome, 0),
     []
   );
 
@@ -135,9 +127,7 @@ export function CommunityPage({
   function handleToggleChallenge(chal: CommunityChallenge, currentlyJoined: boolean) {
     onToggleJoinChallenge(chal.id);
     setLiveStatus(
-      currentlyJoined
-        ? `Left challenge: ${chal.title}.`
-        : `Joined challenge: ${chal.title}.`
+      currentlyJoined ? `Left challenge: ${chal.title}.` : `Joined challenge: ${chal.title}.`
     );
   }
 
@@ -148,9 +138,14 @@ export function CommunityPage({
       </div>
 
       {/* Privacy Guarantee + Collective Impact */}
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3" aria-label="Collective Community Impact">
+      <section
+        className="grid grid-cols-1 gap-4 lg:grid-cols-3"
+        aria-label="Collective Community Impact"
+      >
         <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-xs font-semibold text-slate-600">Estimated Collective Weekly Savings</p>
+          <p className="text-xs font-semibold text-slate-600">
+            Estimated Collective Weekly Savings
+          </p>
           <p className="mt-1 font-mono text-3xl font-bold text-emerald-700 tabular-nums">
             {(collectiveWeeklyKg / 1000).toFixed(2)} t CO2e
           </p>
@@ -182,7 +177,8 @@ export function CommunityPage({
             <span>Community Privacy Safeguard</span>
           </div>
           <p className="mt-2 text-xs leading-relaxed text-slate-600">
-            AIRWISE AI never publishes precise coordinates, home addresses, or user names. Challenge participation stays stored locally on your device.
+            AIRWISE AI never publishes precise coordinates, home addresses, or user names. Challenge
+            participation stays stored locally on your device.
           </p>
         </div>
       </section>
@@ -201,7 +197,9 @@ export function CommunityPage({
             Neighborhood Clean-Air Drives Without Compromising Privacy
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            Coordinated local habits—carpooling school runs, zero open leaf burning, and cutting peak electricity demand—reduce shared neighborhood particulate pollution while protecting sensitive residents.
+            Coordinated local habits—carpooling school runs, zero open leaf burning, and cutting
+            peak electricity demand—reduce shared neighborhood particulate pollution while
+            protecting sensitive residents.
           </p>
         </div>
       </section>
@@ -243,7 +241,10 @@ export function CommunityPage({
           {visibleChallenges.map((chal) => {
             const joined = joinedChallengeIds.includes(chal.id);
             return (
-              <article key={chal.id} className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5">
+              <article
+                key={chal.id}
+                className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5"
+              >
                 <div>
                   <div className="flex items-center justify-between text-xs text-slate-600">
                     <span className="font-semibold text-[#102A43]">{chal.category}</span>
@@ -294,10 +295,15 @@ export function CommunityPage({
               Shareable Environmental Awareness Card
             </h2>
             <p className="text-xs text-slate-600">
-              Generate a clean city-level summary card for housing society or school groups (zero personal data).
+              Generate a clean city-level summary card for housing society or school groups (zero
+              personal data).
             </p>
           </div>
-          <div className="flex gap-1.5 rounded-lg bg-slate-100 p-1" role="tablist" aria-label="Awareness card theme">
+          <div
+            className="flex gap-1.5 rounded-lg bg-slate-100 p-1"
+            role="tablist"
+            aria-label="Awareness card theme"
+          >
             {CARD_THEMES.map((theme, index) => (
               <button
                 key={theme}
@@ -305,7 +311,9 @@ export function CommunityPage({
                 {...cardTabs.getTabProps(theme, index, 'awareness-card-theme')}
                 onClick={() => setCardTheme(theme)}
                 className={`rounded-md px-3 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
-                  cardTheme === theme ? 'bg-white text-[#102A43] shadow-xs' : 'text-slate-600 hover:text-[#102A43]'
+                  cardTheme === theme
+                    ? 'bg-white text-[#102A43] shadow-xs'
+                    : 'text-slate-600 hover:text-[#102A43]'
                 }`}
               >
                 {CARD_THEME_LABELS[theme]}
@@ -323,7 +331,8 @@ export function CommunityPage({
           <h3 className="mt-2 font-display text-xl font-bold">{activeCard.headline}</h3>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200">{activeCard.body}</p>
           <p className="mt-4 text-[11px] text-slate-300">
-            Privacy-safe city summary ({snapshot.location.name}) · No street address or user identity included
+            Privacy-safe city summary ({snapshot.location.name}) · No street address or user
+            identity included
           </p>
         </div>
 
@@ -333,7 +342,11 @@ export function CommunityPage({
             onClick={() => void handleCopyCardText()}
             className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-xs font-semibold text-[#102A43] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8]"
           >
-            {copied ? <Check className="h-4 w-4 text-emerald-700" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
+            {copied ? (
+              <Check className="h-4 w-4 text-emerald-700" aria-hidden="true" />
+            ) : (
+              <Copy className="h-4 w-4" aria-hidden="true" />
+            )}
             <span>{copied ? 'Copied Text' : 'Copy Message'}</span>
           </button>
           <button

@@ -13,8 +13,7 @@ export interface ChatExchange {
 }
 
 export type AssistantClientResult =
-  | { ok: true; reply: AssistantStructuredReply }
-  | { ok: false; error: string };
+  { ok: true; reply: AssistantStructuredReply } | { ok: false; error: string };
 
 let exchangeSeq = 0;
 
@@ -33,10 +32,7 @@ export function createExchangeId(): string {
 /**
  * Formats a single assistant Q&A exchange as readable plain text / Markdown for clipboard or download.
  */
-export function formatAssistantExchangeText(
-  ex: ChatExchange,
-  locationName: string
-): string {
+export function formatAssistantExchangeText(ex: ChatExchange, locationName: string): string {
   return [
     `# AIRWISE AI Guidance (${locationName})`,
     `**Question:** ${ex.question}`,

@@ -201,15 +201,15 @@ test('fetchLiveEnvironmentalSnapshot coalesces concurrent in-flight requests for
     await new Promise((r) => setTimeout(r, 20));
     const url = String(input);
     if (url.includes('air-quality-api.open-meteo.com')) {
-      return new Response(
-        JSON.stringify({ current: { pm2_5: 40, pm10: 70, us_aqi: 112 } }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ current: { pm2_5: 40, pm10: 70, us_aqi: 112 } }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
-    return new Response(
-      JSON.stringify({ current: { temperature_2m: 24, wind_speed_10m: 9 } }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ current: { temperature_2m: 24, wind_speed_10m: 9 } }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }) as typeof fetch;
 
   try {
